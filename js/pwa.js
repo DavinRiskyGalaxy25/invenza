@@ -65,6 +65,7 @@
     currentState = state;
     buttons().forEach((btn) => {
       const isTopbar = btn.dataset.pwaInstall === "topbar";
+      const isAuth = btn.dataset.pwaInstall === "auth";
       const icon = btn.querySelector(".pwa-icon");
       const label = btn.querySelector(".pwa-label");
       btn.dataset.pwaState = state;
@@ -72,8 +73,8 @@
       btn.classList.remove("hidden", "sidebar-pwa-installed");
 
       if (state === "installed") {
-        if (isTopbar) {
-          btn.classList.add("hidden"); // sudah terpasang: topbar tidak perlu tombol
+        if (isTopbar || isAuth) {
+          btn.classList.add("hidden"); // sudah terpasang: topbar & auth tidak perlu tombol
         } else {
           if (icon) icon.className = "bi bi-check-circle-fill pwa-icon";
           if (label) label.textContent = "Invenza Terpasang";
@@ -82,7 +83,7 @@
         }
       } else {
         if (icon) icon.className = "bi bi-download pwa-icon";
-        if (label) label.textContent = isTopbar ? "Install" : "Install Invenza";
+        if (label) label.textContent = isTopbar ? "Install" : (isAuth ? "Install Invenza" : "Install Invenza");
       }
     });
   }

@@ -238,11 +238,33 @@ function generateProductCode(category, existingCodes) {
   return code;
 }
 
-/* ---------- PWA: Service Worker registration ---------- */
+/* ---------- PWA: Service Worker registration & Network Status ---------- */
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js").catch((err) => {
-      console.warn("Registrasi service worker gagal:", err);
-    });
+    navigator.serviceWorker
+      .register("./service-worker.js")
+      .then((reg) => {
+        reg.addEventListener("updatefound", () => {
+          const newWorker = reg.installing;
+          if (newWorker) {
+            newWorker.addEventListener("statechange", () => {
+              if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                showToast("Pembaruan aplikasi tersedia! Muat ulang halaman untuk menerapkan.", "info", 6000);
+              }
+            });
+          }
+        });
+      })
+      .catch((err) => {
+        console.warn("Registrasi service worker gagal:", err);
+      });
   });
 }
+
+window.addEventListener("online", () => {
+  showToast("Koneksi internet kembali aktif.", "success", 3000);
+});
+
+window.addEventListener("offline", () => {
+  showToast("Koneksi terputus. Invenza berjalan dalam mode offline.", "info", 5000);
+});

@@ -42,16 +42,37 @@ async function requireAuth() {
  * input HTML atau state lain yang bisa dimanipulasi.
  */
 async function getCurrentUserId() {
-  const {
-    data: { user },
-    error,
-  } = await supabaseClient.auth.getUser();
+  try {
+    const {
+      data: { user },
+      error,
+    } = await supabaseClient.auth.getUser();
 
-  if (error || !user) {
-    window.location.replace("login.html");
-    return null;
+    if (user && !error) {
+      return user.id;
+    }
+  } catch (err) {
+    // Mode offline: network request gagal, lanjut ke session lokal
+    console.warn("Pemeriksaan user online gagal, mencoba session lokal:", err);
   }
-  return user.id;
+
+  // Fallback offline: gunakan session yang sudah tersimpan di localStorage
+  if (currentSession && currentSession.user && currentSession.user.id) {
+    return currentSession.user.id;
+  }
+
+  try {
+    const { data } = await supabaseClient.auth.getSession();
+    if (data && data.session && data.session.user) {
+      currentSession = data.session;
+      return data.session.user.id;
+    }
+  } catch (err) {
+    console.warn("Gagal membaca session lokal:", err);
+  }
+
+  window.location.replace("login.html");
+  return null;
 }
 
 /**

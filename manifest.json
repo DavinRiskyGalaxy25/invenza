@@ -1,5 +1,5 @@
 {
-  "id": "/index.html",
+  "id": "/",
   "name": "Invenza - Sistem Inventaris Barang",
   "short_name": "Invenza",
   "description": "Aplikasi Sistem Inventaris Barang untuk membantu pemilik dan karyawan toko mengelola data barang.",
@@ -8,21 +8,75 @@
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait-primary",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "any",
   "background_color": "#F5FAFF",
   "theme_color": "#37A5FF",
+  "categories": [
+    "business",
+    "productivity",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "assets/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "assets/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Data Barang",
+      "short_name": "Barang",
+      "description": "Buka katalog dan daftar barang inventaris",
+      "url": "./products.html",
+      "icons": [
+        {
+          "src": "assets/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Buka ringkasan statistik stok toko",
+      "url": "./dashboard.html",
+      "icons": [
+        {
+          "src": "assets/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Import Data",
+      "short_name": "Import",
+      "description": "Import data barang dari Excel atau CSV",
+      "url": "./import.html",
+      "icons": [
+        {
+          "src": "assets/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

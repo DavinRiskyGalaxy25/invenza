@@ -6,9 +6,10 @@
    di sini karena bersifat dinamis/real-time.
    ========================================================================== */
 
-const CACHE_NAME = "invenza-cache-v6";
+const CACHE_NAME = "invenza-cache-v7";
 
 const APP_SHELL = [
+  "./",
   "./index.html",
   "./login.html",
   "./signup.html",
@@ -46,6 +47,11 @@ const APP_SHELL = [
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
   "./assets/icons/favicon.png",
+  // Pustaka eksternal penting agar PWA dapat berjalan offline
+  "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js",
+  "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css",
+  "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/fonts/bootstrap-icons.woff2",
+  "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js",
 ];
 
 // Install: cache seluruh app shell
@@ -71,22 +77,62 @@ self.addEventListener("activate", (event) => {
 });
 
 // Fetch strategy:
-// - Permintaan ke Supabase (API/Storage) -> selalu network (data real-time)
-// - Permintaan app shell -> cache-first, fallback ke network
+// 1. Permintaan ke Supabase API / Storage -> selalu network (data real-time & auth aman).
+// 2. Permintaan CDN (jsdelivr: supabase-js, bootstrap-icons, xlsx) -> Cache-First dengan network fallback & cache update.
+// 3. Permintaan Navigasi HTML -> Network-First dengan fallback ke cache halaman / index.html.
+// 4. Permintaan Aset Statis Lokal -> Network-First dengan fallback ke cache.
 self.addEventListener("fetch", (event) => {
   const url = event.request.url;
 
+  // Supabase API / Auth / Storage: selalu ke jaringan, jangan di-cache
   if (url.includes("supabase.co") || url.includes("supabase.in")) {
-    // Jangan intercept permintaan ke Supabase (data & auth selalu ke network,
-    // tidak pernah di-cache -> data user A tidak bisa bocor ke user B).
     return;
   }
 
   if (event.request.method !== "GET") return;
-  if (!url.startsWith(self.location.origin)) return; // CDN dll: biarkan browser
 
-  // NETWORK-FIRST untuk file app shell: pembaruan (mis. tombol Install baru)
-  // langsung terlihat saat online; cache hanya jadi cadangan saat offline.
+  // Intercept CDN jsDelivr: layani dari cache jika offline agar library tetap tersedia
+  if (url.includes("cdn.jsdelivr.net")) {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) return cachedResponse;
+        return fetch(event.request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              const clone = networkResponse.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+            }
+            return networkResponse;
+          })
+          .catch(() => cachedResponse);
+      })
+    );
+    return;
+  }
+
+  if (!url.startsWith(self.location.origin)) return;
+
+  // Navigasi halaman HTML: jika offline, fallback ke cache halaman atau index.html
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(async () => {
+          const cachedMatch = await caches.match(event.request);
+          if (cachedMatch) return cachedMatch;
+          return (await caches.match("./index.html")) || (await caches.match("./"));
+        })
+    );
+    return;
+  }
+
+  // Aset statis lokal: CSS, JS, Icon, Gambar
   event.respondWith(
     fetch(event.request)
       .then((response) => {

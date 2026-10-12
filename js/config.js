@@ -16,8 +16,8 @@
      dibatasi oleh Row Level Security (RLS) yang diaktifkan di database.
    ========================================================================== */
 
-const SUPABASE_URL = "https://tyrkajcdusftbufmcmlu.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_NSWl0rVfEjsUG6FgcwYn8g_i4ZG1xn1";
+const SUPABASE_URL = "https://slkeehhecddgovpicbqz.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_zYtFBfS9_63T9HsXemSIBw_YgNXvqhS";
 
 // Batas stok menipis. Ubah angka ini jika kebutuhan bisnis berbeda.
 const LOW_STOCK_THRESHOLD = 5;

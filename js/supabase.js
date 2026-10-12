@@ -6,10 +6,16 @@
      - js/config.js (harus dimuat SEBELUM file ini)
    ========================================================================== */
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-  },
-});
+if (!window.supabase) {
+  console.warn("Pustaka Supabase belum tersedia di window. Periksa koneksi atau cache PWA.");
+}
+
+const supabaseClient = window.supabase
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
+    })
+  : null;
