@@ -12,8 +12,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Invenza">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="css/style.css?v=21">
-  <link rel="stylesheet" href="css/dashboard.css?v=21">
+  <link rel="stylesheet" href="css/style.css?v=22">
+  <link rel="stylesheet" href="css/dashboard.css?v=22">
 </head>
 <body>
 
@@ -243,36 +243,48 @@
                 <table class="mini-table">
                   <thead>
                     <tr>
-                      <th>Code</th>
+                      <th class="col-code">Code</th>
                       <th>Product Name</th>
-                      <th>Unit Price</th>
-                      <th>Stock</th>
+                      <th class="col-price">Unit Price</th>
+                      <th class="col-stock">Stock</th>
                     </tr>
                   </thead>
                   <tbody id="recent-products-body">
                     <tr>
-                      <td><span class="skeleton skeleton-text" style="width:55px;"></span></td>
-                      <td><span class="skeleton skeleton-text" style="width:130px;"></span></td>
-                      <td><span class="skeleton skeleton-text" style="width:80px;"></span></td>
-                      <td><span class="skeleton skeleton-text" style="width:35px;"></span></td>
+                      <td class="col-code"><span class="skeleton skeleton-text" style="width:55px;"></span></td>
+                      <td>
+                        <span class="skeleton skeleton-text" style="width:130px;display:block;"></span>
+                        <span class="skeleton skeleton-text mobile-sub-meta" style="width:85px;height:10px;margin-top:4px;"></span>
+                      </td>
+                      <td class="col-price"><span class="skeleton skeleton-text" style="width:80px;"></span></td>
+                      <td class="col-stock"><span class="skeleton skeleton-text" style="width:35px;display:inline-block;"></span></td>
                     </tr>
                     <tr>
-                      <td><span class="skeleton skeleton-text" style="width:60px;"></span></td>
-                      <td><span class="skeleton skeleton-text" style="width:150px;"></span></td>
-                      <td><span class="skeleton skeleton-text" style="width:75px;"></span></td>
-                      <td><span class="skeleton skeleton-text" style="width:30px;"></span></td>
+                      <td class="col-code"><span class="skeleton skeleton-text" style="width:60px;"></span></td>
+                      <td>
+                        <span class="skeleton skeleton-text" style="width:150px;display:block;"></span>
+                        <span class="skeleton skeleton-text mobile-sub-meta" style="width:95px;height:10px;margin-top:4px;"></span>
+                      </td>
+                      <td class="col-price"><span class="skeleton skeleton-text" style="width:75px;"></span></td>
+                      <td class="col-stock"><span class="skeleton skeleton-text" style="width:30px;display:inline-block;"></span></td>
                     </tr>
                     <tr>
-                      <td><span class="skeleton skeleton-text" style="width:52px;"></span></td>
-                      <td><span class="skeleton skeleton-text" style="width:120px;"></span></td>
-                      <td><span class="skeleton skeleton-text" style="width:85px;"></span></td>
-                      <td><span class="skeleton skeleton-text" style="width:40px;"></span></td>
+                      <td class="col-code"><span class="skeleton skeleton-text" style="width:52px;"></span></td>
+                      <td>
+                        <span class="skeleton skeleton-text" style="width:120px;display:block;"></span>
+                        <span class="skeleton skeleton-text mobile-sub-meta" style="width:80px;height:10px;margin-top:4px;"></span>
+                      </td>
+                      <td class="col-price"><span class="skeleton skeleton-text" style="width:85px;"></span></td>
+                      <td class="col-stock"><span class="skeleton skeleton-text" style="width:40px;display:inline-block;"></span></td>
                     </tr>
                     <tr>
-                      <td><span class="skeleton skeleton-text" style="width:58px;"></span></td>
-                      <td><span class="skeleton skeleton-text" style="width:140px;"></span></td>
-                      <td><span class="skeleton skeleton-text" style="width:70px;"></span></td>
-                      <td><span class="skeleton skeleton-text" style="width:35px;"></span></td>
+                      <td class="col-code"><span class="skeleton skeleton-text" style="width:58px;"></span></td>
+                      <td>
+                        <span class="skeleton skeleton-text" style="width:140px;display:block;"></span>
+                        <span class="skeleton skeleton-text mobile-sub-meta" style="width:90px;height:10px;margin-top:4px;"></span>
+                      </td>
+                      <td class="col-price"><span class="skeleton skeleton-text" style="width:70px;"></span></td>
+                      <td class="col-stock"><span class="skeleton skeleton-text" style="width:35px;display:inline-block;"></span></td>
                     </tr>
                   </tbody>
                 </table>
@@ -290,7 +302,7 @@
                 <thead>
                   <tr>
                     <th>Item</th>
-                    <th>Status</th>
+                    <th class="text-right">Status</th>
                   </tr>
                 </thead>
                 <tbody id="low-stock-body">
@@ -299,21 +311,21 @@
                       <span class="skeleton skeleton-text" style="width:120px;display:block;"></span>
                       <span class="skeleton skeleton-text" style="width:55px;height:10px;display:block;margin-top:4px;"></span>
                     </td>
-                    <td><span class="skeleton skeleton-text" style="width:75px;"></span></td>
+                    <td class="text-right"><span class="skeleton skeleton-text" style="width:75px;display:inline-block;"></span></td>
                   </tr>
                   <tr>
                     <td>
                       <span class="skeleton skeleton-text" style="width:140px;display:block;"></span>
                       <span class="skeleton skeleton-text" style="width:60px;height:10px;display:block;margin-top:4px;"></span>
                     </td>
-                    <td><span class="skeleton skeleton-text" style="width:75px;"></span></td>
+                    <td class="text-right"><span class="skeleton skeleton-text" style="width:75px;display:inline-block;"></span></td>
                   </tr>
                   <tr>
                     <td>
                       <span class="skeleton skeleton-text" style="width:110px;display:block;"></span>
                       <span class="skeleton skeleton-text" style="width:50px;height:10px;display:block;margin-top:4px;"></span>
                     </td>
-                    <td><span class="skeleton skeleton-text" style="width:75px;"></span></td>
+                    <td class="text-right"><span class="skeleton skeleton-text" style="width:75px;display:inline-block;"></span></td>
                   </tr>
                 </tbody>
               </table>
@@ -334,6 +346,6 @@
   <script src="js/utils.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/pwa.js"></script>
-  <script src="js/dashboard.js?v=21"></script>
+  <script src="js/dashboard.js?v=22"></script>
 </body>
 </html>

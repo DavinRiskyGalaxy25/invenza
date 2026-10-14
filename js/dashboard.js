@@ -103,10 +103,13 @@ async function loadDashboardStats() {
             .map(
               (p) => `
           <tr onclick="window.location.href='product-detail.html?id=${p.id}'" style="cursor:pointer;">
-            <td>${escapeHtml(p.code)}</td>
-            <td style="font-weight:600;color:var(--color-text);">${escapeHtml(p.name)}</td>
-            <td>${formatRupiah(p.price)}</td>
-            <td><span class="status-text ${getStockStatus(p.stock).cls}">${p.stock}</span></td>
+            <td class="col-code">${escapeHtml(p.code)}</td>
+            <td>
+              <div style="font-weight:600;color:var(--color-text);">${escapeHtml(p.name)}</div>
+              <div class="mobile-sub-meta">${escapeHtml(p.code)} &middot; ${formatRupiah(p.price)}</div>
+            </td>
+            <td class="col-price">${formatRupiah(p.price)}</td>
+            <td class="col-stock"><span class="status-text ${getStockStatus(p.stock).cls}">${p.stock}</span></td>
           </tr>`
             )
             .join("")
@@ -126,7 +129,7 @@ async function loadDashboardStats() {
               <div style="font-weight:600;color:var(--color-text);">${escapeHtml(p.name)}</div>
               <small style="color:var(--color-text-muted);">${escapeHtml(p.code)}</small>
             </td>
-            <td><span class="status-text ${status.cls}">${status.label} (${p.stock})</span></td>
+            <td class="text-right"><span class="status-text ${status.cls}">${status.label} (${p.stock})</span></td>
           </tr>`;
             })
             .join("")

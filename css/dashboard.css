@@ -428,11 +428,23 @@
 /* ---------- Activity / Tables Grid ---------- */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
+  align-items: stretch;
+}
+.dashboard-grid > .card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.dashboard-grid > .card .card-body {
+  flex: 1;
 }
 @media (max-width: 900px) {
-  .dashboard-grid { grid-template-columns: 1fr; }
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
 
 .mini-table {
@@ -444,8 +456,9 @@
 .mini-table th,
 .mini-table td {
   text-align: left;
-  padding: 14px 20px;
+  padding: 13px 18px;
   border: none;
+  vertical-align: middle;
 }
 .mini-table th {
   color: var(--color-text-muted);
@@ -462,9 +475,54 @@
   background-color: rgba(241, 245, 249, 0.7);
   cursor: pointer;
 }
-.mini-table tbody tr td:first-child {
+.mini-table tbody tr td.col-code {
   font-weight: 700;
   color: var(--color-primary-dark);
+}
+.mini-table th.col-stock,
+.mini-table td.col-stock,
+.mini-table th.text-right,
+.mini-table td.text-right {
+  text-align: right;
+}
+
+/* Mobile sub meta for compact 2-column view */
+.mobile-sub-meta {
+  display: none;
+  font-size: 11.5px;
+  color: var(--color-text-muted);
+  margin-top: 3px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+@media (max-width: 680px) {
+  .dashboard-grid {
+    gap: 16px;
+  }
+  .dashboard-grid .card .card-header {
+    padding: 14px 16px 12px;
+  }
+  .dashboard-grid .card .card-header h3 {
+    font-size: 15px;
+  }
+  .mini-table th,
+  .mini-table td {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  .mini-table th {
+    font-size: 11px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  .col-code,
+  .col-price {
+    display: none !important;
+  }
+  .mobile-sub-meta {
+    display: block;
+  }
 }
 
 /* ---------- Status Text (Background-less, Color-adapted Text) ---------- */
