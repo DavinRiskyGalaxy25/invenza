@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Login — Invenza</title>
-  <meta name="theme-color" content="#37A5FF">
+  <title>Sign In — Invenza</title>
+  <meta name="theme-color" content="#38BDF8">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icons/favicon.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
@@ -21,43 +21,43 @@
     <div class="auth-page-pattern"></div>
     <div class="auth-card">
       <div class="auth-brand">
-        <img src="assets/icons/icon-192.png" alt="Logo Invenza">
+        <img src="assets/icons/icon-192.png" alt="Invenza Logo">
         <div class="brand-name">Invenza</div>
-        <div class="brand-sub">For NexByte Game Store</div>
+        <div class="brand-sub">NexByte Game Store — Inventory System</div>
       </div>
 
       <div class="auth-title">
-        <h1>Selamat Datang Kembali</h1>
-        <p>Login untuk mengelola data inventaris Anda.</p>
+        <h1>Welcome Back</h1>
+        <p>Sign in to access your inventory workspace</p>
       </div>
 
       <div id="login-alert" class="auth-alert"></div>
 
       <form id="login-form" novalidate>
         <div class="form-group">
-          <label for="login-email">Email</label>
-          <input type="email" id="login-email" class="form-control" placeholder="Masukkan email" autocomplete="email" required>
+          <label for="login-email">Email Address</label>
+          <input type="email" id="login-email" class="form-control" placeholder="Enter your email" autocomplete="email" required>
         </div>
 
         <div class="form-group">
           <label for="login-password">Password</label>
           <div class="password-wrap">
-            <input type="password" id="login-password" class="form-control" placeholder="Masukkan password" autocomplete="current-password" required>
-            <button type="button" class="toggle-password" data-target="login-password"><i class="bi bi-eye"></i></button>
+            <input type="password" id="login-password" class="form-control" placeholder="Enter your password" autocomplete="current-password" required>
+            <button type="button" class="toggle-password" data-target="login-password" aria-label="Toggle password visibility"><i class="bi bi-eye"></i></button>
           </div>
         </div>
 
-        <button type="submit" id="login-submit" class="btn btn-primary btn-block">LOGIN</button>
+        <button type="submit" id="login-submit" class="btn btn-primary btn-block">Sign In</button>
       </form>
 
       <div class="auth-links">
-        <a href="reset-password.html" class="forgot-link">Lupa Password?</a>
-        <span class="switch-link">Belum punya akun? <a href="signup.html">Daftar</a></span>
+        <a href="reset-password.html" class="forgot-link">Forgot Password?</a>
+        <span class="switch-link">Don't have an account? <a href="signup.html">Create one</a></span>
       </div>
 
-      <div style="margin-top:16px;text-align:center;">
+      <div style="margin-top:20px;text-align:center;">
         <button id="install-pwa-login-btn" data-pwa-install="auth" class="btn btn-secondary btn-sm" type="button" style="border-radius:20px;font-size:12.5px;padding:6px 16px;">
-          <i class="bi bi-download pwa-icon"></i> <span class="pwa-label">Install Invenza</span>
+          <i class="bi bi-download pwa-icon"></i> <span class="pwa-label">Install App</span>
         </button>
       </div>
     </div>

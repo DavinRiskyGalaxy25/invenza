@@ -1,7 +1,7 @@
 /* ==========================================================================
-   INVENZA — Products (Data Barang) Page Logic
-   Menangani: Read (list + search + filter), Create, Update, Delete,
-   dan upload gambar ke Supabase Storage.
+   INVENZA — Products (Inventory) Page Logic
+   Handles: Read (list + search + filter), Create, Update, Delete,
+   and Supabase Storage image uploads.
    ========================================================================== */
 
 let allProducts = [];
@@ -60,9 +60,13 @@ function populateCategoryFilter(products) {
   const select = document.getElementById("filter-category");
   if (!select) return;
   const current = select.value;
-  const categories = [...new Set(products.map((p) => p.category).filter(Boolean))].sort();
+  const productCats = products.map((p) => p.category).filter(Boolean);
+  const predefinedCats = (typeof STORE_CATEGORIES !== "undefined")
+    ? STORE_CATEGORIES.map((c) => c.value)
+    : [];
+  const categories = [...new Set([...predefinedCats, ...productCats])].sort();
   select.innerHTML =
-    `<option value="">Semua Kategori</option>` +
+    `<option value="">All Categories</option>` +
     categories.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
   if (categories.includes(current)) select.value = current;
 }
@@ -73,15 +77,15 @@ function renderProducts(products) {
   const emptyState = document.getElementById("products-empty");
 
   if (!products.length) {
-    tableBody.innerHTML = "";
-    cardsWrap.innerHTML = "";
-    emptyState.classList.remove("hidden");
+    if (tableBody) tableBody.innerHTML = "";
+    if (cardsWrap) cardsWrap.innerHTML = "";
+    if (emptyState) emptyState.classList.remove("hidden");
     return;
   }
-  emptyState.classList.add("hidden");
+  if (emptyState) emptyState.classList.add("hidden");
 
-  tableBody.innerHTML = products.map(renderTableRow).join("");
-  cardsWrap.innerHTML = products.map(renderProductCard).join("");
+  if (tableBody) tableBody.innerHTML = products.map(renderTableRow).join("");
+  if (cardsWrap) cardsWrap.innerHTML = products.map(renderProductCard).join("");
 
   // Bind row/card click -> detail page
   document.querySelectorAll("[data-detail-id]").forEach((el) => {
@@ -108,23 +112,29 @@ function renderProducts(products) {
 
 function renderTableRow(p) {
   const status = getStockStatus(p.stock);
+  const statusColors = {
+    "badge-success": "#059669",
+    "badge-warning": "#D97706",
+    "badge-danger": "#DC2626"
+  };
+  const statusColor = statusColors[status.cls] || "#059669";
   const img = p.image_url
     ? `<img src="${escapeHtml(p.image_url)}" class="product-thumb" alt="${escapeHtml(p.name)}">`
     : `<div class="product-thumb" style="display:flex;align-items:center;justify-content:center;color:var(--color-text-muted);"><i class="bi bi-box-seam"></i></div>`;
   return `
     <tr data-detail-id="${p.id}">
       <td>${img}</td>
-      <td>${escapeHtml(p.code)}</td>
-      <td>${escapeHtml(p.name)}</td>
-      <td>${escapeHtml(p.category)}</td>
-      <td>${formatRupiah(p.price)}</td>
-      <td>${p.stock} <span class="badge ${status.cls}" style="margin-left:6px;">${status.label}</span></td>
+      <td style="font-weight:600;font-size:0.88rem;color:var(--color-primary-dark);">${escapeHtml(p.code)}</td>
+      <td style="font-weight:600;">${escapeHtml(p.name)}</td>
+      <td><span class="badge" style="background:rgba(224,242,254,0.7);color:#0284c7;">${escapeHtml(p.category)}</span></td>
+      <td style="font-weight:600;">${formatRupiah(p.price)}</td>
+      <td>${p.stock} <span class="status-text ${status.cls}" style="margin-left:6px;font-size:12px;font-weight:700;color:${statusColor};background:none!important;background-color:transparent!important;padding:0;border:none;">${status.label}</span></td>
       <td>${escapeHtml(p.unit)}</td>
-      <td>${escapeHtml(p.supplier)}</td>
-      <td>
-        <div class="row-actions">
-          <button class="btn-icon" data-action="edit" data-id="${p.id}" title="Edit"><i class="bi bi-pencil-square"></i></button>
-          <button class="btn-icon" data-action="delete" data-id="${p.id}" title="Hapus"><i class="bi bi-trash"></i></button>
+      <td style="color:var(--color-text-muted);">${escapeHtml(p.supplier)}</td>
+      <td style="text-align:right;">
+        <div class="row-actions" style="justify-content:flex-end;">
+          <button class="btn-icon" data-action="edit" data-id="${p.id}" title="Edit Item"><i class="bi bi-pencil-square"></i></button>
+          <button class="btn-icon" data-action="delete" data-id="${p.id}" title="Delete Item"><i class="bi bi-trash"></i></button>
         </div>
       </td>
     </tr>`;
@@ -132,6 +142,12 @@ function renderTableRow(p) {
 
 function renderProductCard(p) {
   const status = getStockStatus(p.stock);
+  const statusColors = {
+    "badge-success": "#059669",
+    "badge-warning": "#D97706",
+    "badge-danger": "#DC2626"
+  };
+  const statusColor = statusColors[status.cls] || "#059669";
   const img = p.image_url
     ? `<img src="${escapeHtml(p.image_url)}" class="product-thumb" alt="${escapeHtml(p.name)}">`
     : `<div class="product-thumb" style="display:flex;align-items:center;justify-content:center;color:var(--color-text-muted);"><i class="bi bi-box-seam"></i></div>`;
@@ -144,12 +160,12 @@ function renderProductCard(p) {
         <div class="product-card-sub">${escapeHtml(p.code)} · ${escapeHtml(p.category)} · ${escapeHtml(kondisi)}</div>
         <div class="product-card-meta">
           <span class="product-card-price">${formatRupiah(p.price)}</span>
-          <span class="badge ${status.cls}">${status.label}</span>
+          <span class="status-text ${status.cls}" style="font-size:12px;font-weight:700;color:${statusColor};background:none!important;background-color:transparent!important;padding:0;border:none;">${status.label}</span>
         </div>
       </div>
       <div class="product-card-actions">
-        <button class="btn-icon" data-action="edit" data-id="${p.id}" title="Edit"><i class="bi bi-pencil-square"></i></button>
-        <button class="btn-icon" data-action="delete" data-id="${p.id}" title="Hapus"><i class="bi bi-trash"></i></button>
+        <button class="btn-icon" data-action="edit" data-id="${p.id}" title="Edit Item"><i class="bi bi-pencil-square"></i></button>
+        <button class="btn-icon" data-action="delete" data-id="${p.id}" title="Delete Item"><i class="bi bi-trash"></i></button>
       </div>
     </div>`;
 }
@@ -160,14 +176,15 @@ function renderProductCard(p) {
 
 function bindToolbarEvents() {
   const searchInput = document.getElementById("search-input");
+  const topbarSearch = document.getElementById("topbar-search-input");
   const categoryFilter = document.getElementById("filter-category");
   const stockFilter = document.getElementById("filter-stock");
   const addBtn = document.getElementById("add-product-btn");
 
   function applyFilters() {
-    const query = (searchInput.value || "").trim().toLowerCase();
-    const category = categoryFilter.value;
-    const stockStatus = stockFilter.value;
+    const query = ((searchInput ? searchInput.value : "") || (topbarSearch ? topbarSearch.value : "") || "").trim().toLowerCase();
+    const category = categoryFilter ? categoryFilter.value : "";
+    const stockStatus = stockFilter ? stockFilter.value : "";
 
     const filtered = allProducts.filter((p) => {
       const matchesQuery =
@@ -183,10 +200,23 @@ function bindToolbarEvents() {
     renderProducts(filtered);
   }
 
-  searchInput.addEventListener("input", applyFilters);
-  categoryFilter.addEventListener("change", applyFilters);
-  stockFilter.addEventListener("change", applyFilters);
-  addBtn.addEventListener("click", openAddModal);
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      if (topbarSearch) topbarSearch.value = searchInput.value;
+      applyFilters();
+    });
+  }
+
+  if (topbarSearch) {
+    topbarSearch.addEventListener("input", () => {
+      if (searchInput) searchInput.value = topbarSearch.value;
+      applyFilters();
+    });
+  }
+
+  if (categoryFilter) categoryFilter.addEventListener("change", applyFilters);
+  if (stockFilter) stockFilter.addEventListener("change", applyFilters);
+  if (addBtn) addBtn.addEventListener("click", openAddModal);
 }
 
 /* ---------------------------------------------------------------------- */
@@ -195,6 +225,7 @@ function bindToolbarEvents() {
 
 function bindModalEvents() {
   const modal = document.getElementById("product-modal");
+  if (!modal) return;
   const closeButtons = modal.querySelectorAll("[data-close-modal]");
   const form = document.getElementById("product-form");
   const fileInput = document.getElementById("product-image-input");
@@ -206,61 +237,108 @@ function bindModalEvents() {
     if (e.target === modal) closeProductModal();
   });
 
-  fileWrap.addEventListener("click", () => fileInput.click());
-  fileInput.addEventListener("change", () => {
-    const file = fileInput.files[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      showToast("Gambar harus berupa file gambar.", "error");
-      fileInput.value = "";
-      return;
-    }
-    selectedImageFile = file;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      preview.src = e.target.result;
-      preview.classList.remove("hidden");
-    };
-    reader.readAsDataURL(file);
-  });
+  if (fileWrap && fileInput) {
+    fileWrap.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        showToast("File must be a valid image format (PNG, JPG, WebP).", "error");
+        fileInput.value = "";
+        return;
+      }
+      selectedImageFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        preview.src = e.target.result;
+        preview.classList.remove("hidden");
+      };
+      reader.readAsDataURL(file);
+    });
+  }
 
-  form.addEventListener("submit", handleProductFormSubmit);
+  if (form) form.addEventListener("submit", handleProductFormSubmit);
 
-  // Helper text live untuk auto-generate Kode Barang (lihat PRD #7)
-  document.getElementById("product-category").addEventListener("input", updateCodeHelper);
-  document.getElementById("product-code").addEventListener("input", updateCodeHelper);
+  const catSelect = document.getElementById("product-category");
+  const codeInput = document.getElementById("product-code");
+  if (catSelect) {
+    catSelect.addEventListener("change", handleCategoryChange);
+  }
+  if (codeInput) {
+    codeInput.addEventListener("input", updateCodeHelper);
+  }
+}
+
+/**
+ * Triggered whenever the user chooses a category from the dropdown.
+ * Automatically generates and populates the next sequence code (e.g. KB-001, KB-002, CPU-001).
+ */
+function handleCategoryChange() {
+  const catSelect = document.getElementById("product-category");
+  const codeInput = document.getElementById("product-code");
+  if (!catSelect || !codeInput) return;
+
+  const category = (catSelect.value || "").trim();
+  if (!category) {
+    if (!editingProductId) codeInput.value = "";
+    updateCodeHelper();
+    return;
+  }
+
+  // When adding a new product (or if user cleared code in edit mode),
+  // automatically calculate the next sequence code and populate the input.
+  if (!editingProductId || !codeInput.value.trim()) {
+    const existingCodes = allProducts
+      .filter((p) => !editingProductId || String(p.id) !== String(editingProductId))
+      .map((p) => p.code);
+    const generatedCode = generateProductCode(category, existingCodes);
+    codeInput.value = generatedCode;
+  }
+  updateCodeHelper();
 }
 
 function updateCodeHelper() {
   const codeHelper = document.getElementById("code-helper-text");
   if (!codeHelper) return;
 
+  const category = (document.getElementById("product-category")?.value || "").trim();
+  const code = (document.getElementById("product-code")?.value || "").trim();
+
   if (editingProductId) {
-    codeHelper.textContent = "Kosongkan untuk mempertahankan kode barang saat ini.";
+    codeHelper.textContent = "Current item SKU code. Edit if you wish to reassign SKU.";
     return;
   }
-  const category = document.getElementById("product-category").value.trim();
-  const manualCode = document.getElementById("product-code").value.trim();
-  if (manualCode) {
-    codeHelper.textContent = "Menggunakan kode custom yang Anda masukkan.";
-  } else if (!category) {
-    codeHelper.textContent = "Silakan pilih kategori terlebih dahulu agar kode barang dapat dibuat otomatis.";
-  } else {
+
+  if (code && category) {
+    const prefix = buildCategoryCodePrefix(category);
+    codeHelper.innerHTML = `Auto-assigned SKU for <strong>${escapeHtml(category)}</strong>: <code>${escapeHtml(code)}</code> (Next available sequence for prefix <code>${prefix}</code>)`;
+  } else if (category) {
     const preview = generateProductCode(category, allProducts.map((p) => p.code));
-    codeHelper.textContent = `Kode otomatis: ${preview}`;
+    codeHelper.innerHTML = `Suggested code for <strong>${escapeHtml(category)}</strong>: <code>${escapeHtml(preview)}</code>`;
+  } else {
+    codeHelper.textContent = "Select a category above to automatically generate item code (e.g. KB-001, CPU-001).";
   }
 }
 
 function openAddModal() {
   editingProductId = null;
   selectedImageFile = null;
-  document.getElementById("product-modal-title").textContent = "Tambah Barang";
-  document.getElementById("product-form").reset();
-  document.getElementById("product-kondisi").value = "Bagus";
-  document.getElementById("image-preview").classList.add("hidden");
+  const title = document.getElementById("product-modal-title");
+  if (title) title.textContent = "Add Product";
+  const form = document.getElementById("product-form");
+  if (form) form.reset();
+  const catSelect = document.getElementById("product-category");
+  if (catSelect) catSelect.value = "";
+  const unitSelect = document.getElementById("product-unit");
+  if (unitSelect) unitSelect.value = "Pcs";
+  const kondisi = document.getElementById("product-kondisi");
+  if (kondisi) kondisi.value = "Bagus";
+  const preview = document.getElementById("image-preview");
+  if (preview) preview.classList.add("hidden");
   clearFormErrors();
   updateCodeHelper();
-  document.getElementById("product-modal").classList.remove("hidden");
+  const modal = document.getElementById("product-modal");
+  if (modal) modal.classList.remove("hidden");
 }
 
 function openEditModal(id) {
@@ -271,35 +349,74 @@ function openEditModal(id) {
   selectedImageFile = null;
   clearFormErrors();
 
-  document.getElementById("product-modal-title").textContent = "Edit Barang";
-  document.getElementById("product-code").value = product.code || "";
-  document.getElementById("product-name").value = product.name || "";
-  document.getElementById("product-category").value = product.category || "";
-  document.getElementById("product-price").value = product.price || "";
-  document.getElementById("product-stock").value = product.stock || "";
-  document.getElementById("product-unit").value = product.unit || "";
-  document.getElementById("product-supplier").value = product.supplier || "";
-  document.getElementById("product-publisher").value = product.publisher || "";
-  document.getElementById("product-kondisi").value = product.kondisi || "Bagus";
-  document.getElementById("product-lokasi").value = product.lokasi || "";
-  document.getElementById("product-catatan").value = product.catatan || "";
+  const title = document.getElementById("product-modal-title");
+  if (title) title.textContent = "Edit Product";
+
+  const setVal = (fieldId, val) => {
+    const el = document.getElementById(fieldId);
+    if (el) el.value = val || "";
+  };
+
+  setVal("product-code", product.code);
+  setVal("product-name", product.name);
+
+  // Set category dropdown, creating custom option if category is not pre-listed
+  const catSelect = document.getElementById("product-category");
+  if (catSelect && product.category) {
+    const exists = Array.from(catSelect.options).some((opt) => opt.value === product.category);
+    if (!exists) {
+      const customOpt = document.createElement("option");
+      customOpt.value = product.category;
+      customOpt.textContent = product.category;
+      catSelect.appendChild(customOpt);
+    }
+    catSelect.value = product.category;
+  }
+
+  setVal("product-price", product.price);
+  setVal("product-stock", product.stock);
+
+  // Set unit dropdown, creating custom option if unit is not pre-listed
+  const unitSelect = document.getElementById("product-unit");
+  if (unitSelect && product.unit) {
+    const exists = Array.from(unitSelect.options).some((opt) => opt.value === product.unit);
+    if (!exists) {
+      const customOpt = document.createElement("option");
+      customOpt.value = product.unit;
+      customOpt.textContent = product.unit;
+      unitSelect.appendChild(customOpt);
+    }
+    unitSelect.value = product.unit;
+  }
+
+  setVal("product-supplier", product.supplier);
+  setVal("product-publisher", product.publisher);
+  setVal("product-kondisi", product.kondisi || "Bagus");
+  setVal("product-lokasi", product.lokasi);
+  setVal("product-catatan", product.catatan);
 
   const preview = document.getElementById("image-preview");
-  if (product.image_url) {
-    preview.src = product.image_url;
-    preview.classList.remove("hidden");
-  } else {
-    preview.classList.add("hidden");
+  if (preview) {
+    if (product.image_url) {
+      preview.src = product.image_url;
+      preview.classList.remove("hidden");
+    } else {
+      preview.classList.add("hidden");
+    }
   }
 
   updateCodeHelper();
-  document.getElementById("product-modal").classList.remove("hidden");
+  const modal = document.getElementById("product-modal");
+  if (modal) modal.classList.remove("hidden");
 }
 
 function closeProductModal() {
-  document.getElementById("product-modal").classList.add("hidden");
-  document.getElementById("product-form").reset();
-  document.getElementById("product-image-input").value = "";
+  const modal = document.getElementById("product-modal");
+  if (modal) modal.classList.add("hidden");
+  const form = document.getElementById("product-form");
+  if (form) form.reset();
+  const fileInput = document.getElementById("product-image-input");
+  if (fileInput) fileInput.value = "";
   selectedImageFile = null;
   editingProductId = null;
 }
@@ -314,30 +431,27 @@ function clearFormErrors() {
 
 function validateProductForm(values) {
   const errors = {};
-  // Kode Barang bersifat OPSIONAL (lihat PRD #7) — jika kosong akan
-  // dibuatkan otomatis berdasarkan kategori saat submit, jadi TIDAK
-  // divalidasi sebagai wajib diisi di sini.
-  if (!values.name) errors.name = "Nama barang wajib diisi.";
-  if (!values.category) errors.category = "Kategori wajib diisi.";
+  if (!values.name) errors.name = "Product name is required.";
+  if (!values.category) errors.category = "Category is required.";
 
   if (values.price === "" || values.price === null) {
-    errors.price = "Harga wajib diisi.";
+    errors.price = "Unit price is required.";
   } else if (isNaN(Number(values.price))) {
-    errors.price = "Harga harus berupa angka.";
+    errors.price = "Unit price must be a valid number.";
   } else if (Number(values.price) < 0) {
-    errors.price = "Harga tidak boleh negatif.";
+    errors.price = "Unit price cannot be negative.";
   }
 
   if (values.stock === "" || values.stock === null) {
-    errors.stock = "Stok wajib diisi.";
+    errors.stock = "Stock quantity is required.";
   } else if (isNaN(Number(values.stock))) {
-    errors.stock = "Stok harus berupa angka.";
+    errors.stock = "Stock quantity must be a valid number.";
   } else if (Number(values.stock) < 0) {
-    errors.stock = "Stok tidak boleh kurang dari 0.";
+    errors.stock = "Stock quantity cannot be negative.";
   }
 
-  if (!values.unit) errors.unit = "Satuan wajib diisi.";
-  if (!values.supplier) errors.supplier = "Supplier wajib diisi.";
+  if (!values.unit) errors.unit = "Unit of measurement is required.";
+  if (!values.supplier) errors.supplier = "Supplier name is required.";
 
   return errors;
 }
@@ -361,10 +475,6 @@ async function isDuplicateCode(code, excludeId) {
 }
 
 async function uploadProductImage(file, userId) {
-  // Path WAJIB diawali "<user_id>/" agar sesuai dengan Storage RLS policy
-  // (lihat supabase.sql): setiap akun hanya boleh menulis ke folder miliknya
-  // sendiri. Nama file dibuat sendiri oleh sistem (buildUniqueFileName),
-  // TIDAK pernah mempercayai nama file asli dari browser.
   const fileName = `${userId}/${buildUniqueFileName(file.name)}`;
   const { error: uploadError } = await supabaseClient.storage
     .from(PRODUCT_IMAGE_BUCKET)
@@ -384,7 +494,7 @@ async function deleteProductImageByUrl(imageUrl) {
     const path = decodeURIComponent(parts[1]);
     await supabaseClient.storage.from(PRODUCT_IMAGE_BUCKET).remove([path]);
   } catch (err) {
-    console.warn("Gagal menghapus gambar lama:", err);
+    console.warn("Failed to delete obsolete image:", err);
   }
 }
 
@@ -392,17 +502,17 @@ async function handleProductFormSubmit(e) {
   e.preventDefault();
 
   const values = {
-    code: document.getElementById("product-code").value.trim(),
-    name: document.getElementById("product-name").value.trim(),
-    category: document.getElementById("product-category").value.trim(),
-    price: document.getElementById("product-price").value,
-    stock: document.getElementById("product-stock").value,
-    unit: document.getElementById("product-unit").value.trim(),
-    supplier: document.getElementById("product-supplier").value.trim(),
-    publisher: document.getElementById("product-publisher").value.trim(),
-    kondisi: document.getElementById("product-kondisi").value,
-    lokasi: document.getElementById("product-lokasi").value.trim(),
-    catatan: document.getElementById("product-catatan").value.trim(),
+    code: (document.getElementById("product-code")?.value || "").trim(),
+    name: (document.getElementById("product-name")?.value || "").trim(),
+    category: (document.getElementById("product-category")?.value || "").trim(),
+    price: document.getElementById("product-price")?.value,
+    stock: document.getElementById("product-stock")?.value,
+    unit: (document.getElementById("product-unit")?.value || "").trim(),
+    supplier: (document.getElementById("product-supplier")?.value || "").trim(),
+    publisher: (document.getElementById("product-publisher")?.value || "").trim(),
+    kondisi: document.getElementById("product-kondisi")?.value,
+    lokasi: (document.getElementById("product-lokasi")?.value || "").trim(),
+    catatan: (document.getElementById("product-catatan")?.value || "").trim(),
   };
 
   const errors = validateProductForm(values);
@@ -413,16 +523,12 @@ async function handleProductFormSubmit(e) {
   clearFormErrors();
 
   const submitBtn = document.getElementById("product-submit-btn");
-  setButtonLoading(submitBtn, true, editingProductId ? "Menyimpan..." : "Menyimpan...");
+  setButtonLoading(submitBtn, true, editingProductId ? "Saving Changes..." : "Saving Product...");
 
   try {
-    // Ambil user_id langsung dari Supabase Auth — TIDAK PERNAH dari input HTML.
     const userId = await getCurrentUserId();
     if (!userId) return;
 
-    // ---- Kode Barang: pakai input manual jika diisi, kalau tidak buat
-    //      otomatis berdasarkan kategori (lihat PRD #7). TIDAK PERNAH
-    //      menghasilkan kode kosong / "undefined-001" / "null-001". ----
     let finalCode = values.code;
     if (!finalCode) {
       const existingCodes = allProducts
@@ -431,10 +537,9 @@ async function handleProductFormSubmit(e) {
       finalCode = generateProductCode(values.category, existingCodes);
     }
 
-    // Cek duplikasi kode barang (hanya dalam lingkup data milik user ini)
     const duplicate = await isDuplicateCode(finalCode, editingProductId);
     if (duplicate) {
-      showFormErrors({ code: "Kode barang sudah digunakan." });
+      showFormErrors({ code: "This item code is already in use." });
       setButtonLoading(submitBtn, false);
       return;
     }
@@ -449,7 +554,7 @@ async function handleProductFormSubmit(e) {
     }
 
     if (selectedImageFile) {
-      setButtonLoading(submitBtn, true, "Mengupload gambar...");
+      setButtonLoading(submitBtn, true, "Uploading image...");
       const uploaded = await uploadProductImage(selectedImageFile, userId);
       imageUrl = uploaded.url;
     }
@@ -470,7 +575,7 @@ async function handleProductFormSubmit(e) {
       updated_at: new Date().toISOString(),
     };
 
-    setButtonLoading(submitBtn, true, "Menyimpan data...");
+    setButtonLoading(submitBtn, true, "Saving product...");
 
     if (editingProductId) {
       const { error } = await supabaseClient
@@ -480,16 +585,14 @@ async function handleProductFormSubmit(e) {
         .eq("user_id", userId);
       if (error) throw error;
 
-      // Hapus gambar lama jika diganti dengan gambar baru
       if (selectedImageFile && oldImageUrl && oldImageUrl !== imageUrl) {
         await deleteProductImageByUrl(oldImageUrl);
       }
-      showToast("Data berhasil diperbarui");
+      showToast("Product updated successfully", "success");
     } else {
-      // user_id diambil dari sesi Supabase Auth yang sedang login, bukan dari form.
       const { error } = await supabaseClient.from("products").insert({ ...payload, user_id: userId });
       if (error) throw error;
-      showToast("Barang berhasil ditambahkan");
+      showToast("Product added successfully", "success");
     }
 
     closeProductModal();
@@ -511,10 +614,10 @@ async function deleteProduct(id) {
   if (!product) return;
 
   const confirmed = await confirmDialog({
-    title: "Hapus Barang",
-    message: `Apakah Anda yakin ingin menghapus "${product.name}"? Tindakan ini tidak dapat dibatalkan.`,
-    confirmText: "Hapus",
-    cancelText: "Batal",
+    title: "Delete Product",
+    message: `Are you sure you want to delete "${product.name}"? This action cannot be undone.`,
+    confirmText: "Delete",
+    cancelText: "Cancel",
     danger: true,
   });
   if (!confirmed) return;
@@ -530,7 +633,7 @@ async function deleteProduct(id) {
       await deleteProductImageByUrl(product.image_url);
     }
 
-    showToast("Barang berhasil dihapus");
+    showToast("Product deleted successfully", "success");
     await loadProducts();
   } catch (err) {
     console.error(err);

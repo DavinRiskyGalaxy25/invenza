@@ -1,7 +1,7 @@
 /* ==========================================================================
    INVENZA — Profile Page Logic
-   Menangani: tampilan info akun, Edit Profile (username, email, foto profil),
-   Ganti Password, dan tombol Install PWA.
+   Handles: Account information display, Edit Profile (username, email, avatar),
+   Change Password, and PWA integration.
    ========================================================================== */
 
 let profileSelectedAvatarFile = null;
@@ -28,14 +28,26 @@ function renderProfilePage(profile, session) {
   const email = session?.user?.email || profile?.email || "-";
   const name = getDisplayName(profile);
 
-  document.getElementById("profile-name-hero").textContent = name;
-  document.getElementById("profile-email-hero").textContent = email;
+  const heroName = document.getElementById("profile-name-hero");
+  if (heroName) heroName.textContent = name;
+
+  const heroEmail = document.getElementById("profile-email-hero");
+  if (heroEmail) heroEmail.textContent = email;
+
   renderAvatarInto(document.getElementById("profile-avatar-hero"), profile, name);
 
-  document.getElementById("info-username").textContent =
-    (profile && profile.username) ? profile.username : "Belum diatur";
-  document.getElementById("info-email").textContent = email;
-  document.getElementById("info-joined").textContent = profile && profile.created_at ? formatDate(profile.created_at) : "-";
+  const usernameEl = document.getElementById("info-username");
+  if (usernameEl) {
+    usernameEl.textContent = (profile && profile.username) ? profile.username : "Not set";
+  }
+
+  const emailEl = document.getElementById("info-email");
+  if (emailEl) emailEl.textContent = email;
+
+  const joinedEl = document.getElementById("info-joined");
+  if (joinedEl) {
+    joinedEl.textContent = profile && profile.created_at ? formatDate(profile.created_at) : "-";
+  }
 }
 
 /* ---------------------------------------------------------------------- */
@@ -51,6 +63,8 @@ function bindEditProfileModal(session) {
   const removePhotoBtn = document.getElementById("remove-photo-btn");
   const preview = document.getElementById("avatar-picker-preview");
 
+  if (!modal || !openBtn) return;
+
   openBtn.addEventListener("click", () => openEditProfileModal(session));
   modal.querySelectorAll("[data-close-modal]").forEach((btn) =>
     btn.addEventListener("click", () => closeEditProfileModal())
@@ -59,58 +73,72 @@ function bindEditProfileModal(session) {
     if (e.target === modal) closeEditProfileModal();
   });
 
-  changePhotoBtn.addEventListener("click", () => fileInput.click());
+  if (changePhotoBtn && fileInput) {
+    changePhotoBtn.addEventListener("click", () => fileInput.click());
 
-  fileInput.addEventListener("change", () => {
-    const file = fileInput.files[0];
-    document.getElementById("error-avatar").textContent = "";
-    if (!file) return;
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files[0];
+      const errorAvatar = document.getElementById("error-avatar");
+      if (errorAvatar) errorAvatar.textContent = "";
+      if (!file) return;
 
-    const check = validateAvatarFile(file);
-    if (!check.valid) {
-      document.getElementById("error-avatar").textContent = check.message;
-      fileInput.value = "";
-      return;
-    }
+      const check = validateAvatarFile(file);
+      if (!check.valid) {
+        if (errorAvatar) errorAvatar.textContent = check.message;
+        fileInput.value = "";
+        return;
+      }
 
-    profileSelectedAvatarFile = file;
-    profileRemoveAvatarFlag = false;
+      profileSelectedAvatarFile = file;
+      profileRemoveAvatarFlag = false;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      preview.innerHTML = `<img src="${e.target.result}" alt="Preview foto profil">`;
-    };
-    reader.readAsDataURL(file);
-  });
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        preview.innerHTML = `<img src="${e.target.result}" alt="Avatar Preview">`;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
 
-  removePhotoBtn.addEventListener("click", () => {
-    profileSelectedAvatarFile = null;
-    profileRemoveAvatarFlag = true;
-    fileInput.value = "";
-    preview.textContent = getDisplayName(currentProfile).trim().charAt(0).toUpperCase();
-    document.getElementById("error-avatar").textContent = "";
-  });
+  if (removePhotoBtn) {
+    removePhotoBtn.addEventListener("click", () => {
+      profileSelectedAvatarFile = null;
+      profileRemoveAvatarFlag = true;
+      if (fileInput) fileInput.value = "";
+      preview.textContent = getDisplayName(currentProfile).trim().charAt(0).toUpperCase();
+      const errorAvatar = document.getElementById("error-avatar");
+      if (errorAvatar) errorAvatar.textContent = "";
+    });
+  }
 
-  form.addEventListener("submit", (e) => handleEditProfileSubmit(e, session));
+  if (form) form.addEventListener("submit", (e) => handleEditProfileSubmit(e, session));
 }
 
 function openEditProfileModal(session) {
   profileSelectedAvatarFile = null;
   profileRemoveAvatarFlag = false;
 
-  document.getElementById("edit-username").value = (currentProfile && currentProfile.username) || "";
-  document.getElementById("edit-email").value = session?.user?.email || "";
-  document.getElementById("avatar-file-input").value = "";
+  const usernameInput = document.getElementById("edit-username");
+  if (usernameInput) usernameInput.value = (currentProfile && currentProfile.username) || "";
+
+  const emailInput = document.getElementById("edit-email");
+  if (emailInput) emailInput.value = session?.user?.email || "";
+
+  const fileInput = document.getElementById("avatar-file-input");
+  if (fileInput) fileInput.value = "";
+
   clearEditProfileErrors();
 
   const preview = document.getElementById("avatar-picker-preview");
   renderAvatarInto(preview, currentProfile, getDisplayName(currentProfile));
 
-  document.getElementById("edit-profile-modal").classList.remove("hidden");
+  const modal = document.getElementById("edit-profile-modal");
+  if (modal) modal.classList.remove("hidden");
 }
 
 function closeEditProfileModal() {
-  document.getElementById("edit-profile-modal").classList.add("hidden");
+  const modal = document.getElementById("edit-profile-modal");
+  if (modal) modal.classList.add("hidden");
 }
 
 function clearEditProfileErrors() {
@@ -121,16 +149,18 @@ async function handleEditProfileSubmit(e, session) {
   e.preventDefault();
   clearEditProfileErrors();
 
-  const usernameRaw = document.getElementById("edit-username").value;
-  const emailRaw = document.getElementById("edit-email").value.trim();
+  const usernameRaw = document.getElementById("edit-username")?.value || "";
+  const emailRaw = (document.getElementById("edit-email")?.value || "").trim();
 
   const usernameCheck = validateUsername(usernameRaw);
   if (!usernameCheck.valid) {
-    document.getElementById("error-username").textContent = usernameCheck.message;
+    const errorEl = document.getElementById("error-username");
+    if (errorEl) errorEl.textContent = usernameCheck.message;
     return;
   }
   if (!emailRaw) {
-    document.getElementById("error-email").textContent = "Email wajib diisi.";
+    const errorEl = document.getElementById("error-email");
+    if (errorEl) errorEl.textContent = "Email address is required.";
     return;
   }
 
@@ -142,7 +172,7 @@ async function handleEditProfileSubmit(e, session) {
     const userId = await getCurrentUserId();
     if (!userId) return;
 
-    // ---- 1. Simpan username (tabel profiles) ----
+    // 1. Update username
     const { error: usernameError } = await supabaseClient
       .from("profiles")
       .update({ username: usernameCheck.value, updated_at: new Date().toISOString() })
@@ -150,13 +180,14 @@ async function handleEditProfileSubmit(e, session) {
 
     if (usernameError) {
       if (usernameError.code === "23505") {
-        document.getElementById("error-username").textContent = "Username sudah digunakan, coba yang lain.";
+        const errorEl = document.getElementById("error-username");
+        if (errorEl) errorEl.textContent = "Username is already taken, please choose another.";
         return;
       }
       throw usernameError;
     }
 
-    // ---- 2. Foto profil: upload baru / hapus, gunakan Supabase Storage ----
+    // 2. Avatar handling
     if (profileSelectedAvatarFile || profileRemoveAvatarFlag) {
       setButtonLoading(submitBtn, true, "Uploading photo...");
       try {
@@ -168,13 +199,14 @@ async function handleEditProfileSubmit(e, session) {
       }
     }
 
-    // ---- 3. Email: HARUS lewat supabase.auth.updateUser, bukan tabel profiles ----
+    // 3. Email update via auth
     let emailPending = false;
     if (emailRaw && session?.user?.email && emailRaw !== session.user.email) {
       setButtonLoading(submitBtn, true, "Saving...");
       const { error: emailError } = await supabaseClient.auth.updateUser({ email: emailRaw });
       if (emailError) {
-        document.getElementById("error-email").textContent = translateError(emailError);
+        const errorEl = document.getElementById("error-email");
+        if (errorEl) errorEl.textContent = translateError(emailError);
         return;
       }
       emailPending = true;
@@ -187,9 +219,9 @@ async function handleEditProfileSubmit(e, session) {
     closeEditProfileModal();
 
     if (emailPending) {
-      showToast("Permintaan perubahan email berhasil. Silakan cek email baru kamu untuk verifikasi.", "info", 6000);
+      showToast("Email change requested. Please check your new inbox to confirm.", "info", 6000);
     } else {
-      showToast("Profil berhasil diperbarui");
+      showToast("Profile updated successfully", "success");
     }
   } catch (err) {
     console.error(err);
@@ -200,24 +232,11 @@ async function handleEditProfileSubmit(e, session) {
   }
 }
 
-/**
- * Ganti/hapus foto profil dengan URUTAN YANG AMAN (lihat PRD #14):
- *   1. Upload foto BARU dulu (foto lama TIDAK disentuh sama sekali).
- *   2. Jika upload gagal -> berhenti, foto lama tetap aman.
- *   3. Jika upload berhasil -> update kolom profiles.avatar_url.
- *   4. Jika update DB gagal -> hapus file baru yang baru diupload (rollback),
- *      foto lama TETAP aman & tidak dihapus.
- *   5. Jika update DB berhasil -> BARU hapus file foto lama milik user ini
- *      (bukan menghapus seluruh isi folder secara membabi buta, hanya file
- *      lama yang tercatat sebelumnya di avatar_url, dan tidak pernah
- *      menghapus file yang baru saja diupload).
- */
 async function applyAvatarChange(userId, file) {
   const previousAvatarUrl = currentProfile && currentProfile.avatar_url;
   let newAvatarUrl = null;
   let newPath = null;
 
-  // ---- 1. Upload foto baru (jika ada) — foto lama belum disentuh ----
   if (file) {
     const check = validateAvatarFile(file);
     if (!check.valid) throw new Error(check.message);
@@ -226,28 +245,24 @@ async function applyAvatarChange(userId, file) {
     const { error: uploadError } = await supabaseClient.storage
       .from(PROFILE_IMAGE_BUCKET)
       .upload(newPath, file, { cacheControl: "3600", upsert: false });
-    if (uploadError) throw uploadError; // gagal upload -> foto lama tetap aman
+    if (uploadError) throw uploadError;
 
     const { data } = supabaseClient.storage.from(PROFILE_IMAGE_BUCKET).getPublicUrl(newPath);
     newAvatarUrl = data.publicUrl;
   }
-  // Jika file null (mode hapus foto), newAvatarUrl tetap null -> avatar_url akan diset NULL.
 
-  // ---- 2. Update database dulu ----
   const { error: dbError } = await supabaseClient
     .from("profiles")
     .update({ avatar_url: newAvatarUrl, updated_at: new Date().toISOString() })
     .eq("id", userId);
 
   if (dbError) {
-    // Update DB gagal -> rollback file baru (jika ada), foto lama TIDAK dihapus.
     if (newPath) {
       await supabaseClient.storage.from(PROFILE_IMAGE_BUCKET).remove([newPath]).catch(() => {});
     }
     throw dbError;
   }
 
-  // ---- 3. Baru sekarang aman menghapus foto LAMA (bukan seluruh folder) ----
   if (previousAvatarUrl) {
     try {
       const parts = previousAvatarUrl.split(`${PROFILE_IMAGE_BUCKET}/`);
@@ -258,7 +273,7 @@ async function applyAvatarChange(userId, file) {
         }
       }
     } catch (cleanupErr) {
-      console.warn("Gagal membersihkan foto lama (tidak fatal):", cleanupErr);
+      console.warn("Failed to delete obsolete avatar image:", cleanupErr);
     }
   }
 }
@@ -272,11 +287,14 @@ function bindChangePasswordModal() {
   const openBtn = document.getElementById("open-change-password-btn");
   const form = document.getElementById("change-password-form");
 
+  if (!modal || !openBtn) return;
+
   openBtn.addEventListener("click", () => {
-    form.reset();
+    if (form) form.reset();
     clearChangePasswordErrors();
     modal.classList.remove("hidden");
   });
+
   modal.querySelectorAll("[data-close-modal]").forEach((btn) =>
     btn.addEventListener("click", () => modal.classList.add("hidden"))
   );
@@ -284,7 +302,7 @@ function bindChangePasswordModal() {
     if (e.target === modal) modal.classList.add("hidden");
   });
 
-  form.addEventListener("submit", handleChangePasswordSubmit);
+  if (form) form.addEventListener("submit", handleChangePasswordSubmit);
 }
 
 function clearChangePasswordErrors() {
@@ -295,31 +313,36 @@ async function handleChangePasswordSubmit(e) {
   e.preventDefault();
   clearChangePasswordErrors();
 
-  const newPassword = document.getElementById("new-password").value;
-  const confirmPassword = document.getElementById("confirm-new-password").value;
+  const newPassword = document.getElementById("new-password")?.value;
+  const confirmPassword = document.getElementById("confirm-new-password")?.value;
 
   if (!newPassword || newPassword.length < 6) {
-    document.getElementById("error-new-password").textContent = "Password minimal 6 karakter.";
+    const errorEl = document.getElementById("error-new-password");
+    if (errorEl) errorEl.textContent = "Password must be at least 6 characters.";
     return;
   }
   if (newPassword !== confirmPassword) {
-    document.getElementById("error-confirm-password").textContent = "Konfirmasi password tidak sama.";
+    const errorEl = document.getElementById("error-confirm-password");
+    if (errorEl) errorEl.textContent = "Passwords do not match.";
     return;
   }
 
   const submitBtn = document.getElementById("change-password-submit-btn");
-  setButtonLoading(submitBtn, true, "Saving...");
+  setButtonLoading(submitBtn, true, "Updating...");
 
   try {
     const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
     if (error) throw error;
 
-    showToast("Password berhasil diperbarui");
-    document.getElementById("change-password-modal").classList.add("hidden");
-    document.getElementById("change-password-form").reset();
+    showToast("Password updated successfully", "success");
+    const modal = document.getElementById("change-password-modal");
+    if (modal) modal.classList.add("hidden");
+    const form = document.getElementById("change-password-form");
+    if (form) form.reset();
   } catch (err) {
     console.error(err);
-    document.getElementById("error-new-password").textContent = translateError(err);
+    const errorEl = document.getElementById("error-new-password");
+    if (errorEl) errorEl.textContent = translateError(err);
   } finally {
     setButtonLoading(submitBtn, false);
   }

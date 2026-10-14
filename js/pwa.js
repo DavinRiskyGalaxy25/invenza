@@ -1,18 +1,9 @@
 /* ==========================================================================
-   INVENZA — PWA Install Logic (SATU-SATUNYA sistem PWA).
-   Mengontrol SEMUA tombol dengan atribut [data-pwa-install]:
-     - "sidebar": tombol di atas Logout (drawer/sidebar)
-     - "topbar" : tombol ringkas di topbar, terlihat langsung di Android
-                  tanpa harus membuka menu drawer.
-
-   State:
-     installed   : berjalan standalone / event appinstalled.
-     installable : beforeinstallprompt tersedia -> prompt install NATIF.
-     manual      : tidak ada beforeinstallprompt, tapi tetap bisa install
-                   lewat menu browser -> tampilkan instruksi platform.
-     insecure    : halaman dibuka lewat http:// (bukan HTTPS/localhost).
-                   Tombol TETAP tampil dan menjelaskan bahwa install
-                   butuh HTTPS (tidak disembunyikan diam-diam).
+   INVENZA — PWA Installation System (English Standard)
+   Controls all install triggers with attribute [data-pwa-install]:
+     - "sidebar": primary action in navigation drawer
+     - "topbar" : compact button for mobile headers
+     - "auth"   : prompt on public login / register cards
    ========================================================================== */
 
 (function () {
@@ -45,15 +36,15 @@
   function manualHint() {
     switch (PLATFORM) {
       case "ios-safari":
-        return 'Di Safari: tap tombol Share (kotak dengan panah ke atas), lalu pilih "Add to Home Screen".';
+        return 'In Safari: Tap the Share button (box with upward arrow), then select "Add to Home Screen".';
       case "android-firefox":
-        return 'Buka menu (⋮) di Firefox, lalu pilih "Install" atau "Add to Home screen".';
+        return 'Open menu (⋮) in Firefox, then select "Install" or "Add to Home screen".';
       case "android-chrome":
-        return 'Buka menu (⋮) di Chrome, lalu pilih "Install app" atau "Add to Home screen".';
+        return 'Open menu (⋮) in Chrome, then select "Install app" or "Add to Home screen".';
       case "desktop-firefox":
-        return "Firefox desktop belum menyediakan prompt install untuk PWA. Anda bisa menyematkan (pin) tab ini atau membuat bookmark.";
+        return "Firefox desktop does not support direct PWA prompt. You can pin this tab or bookmark the page.";
       default:
-        return 'Klik ikon install (⊕) di address bar, atau buka menu (⋮) browser lalu pilih "Install Invenza".';
+        return 'Click the install icon (⊕) in the browser address bar, or open menu (⋮) and select "Install Invenza".';
     }
   }
 
@@ -74,16 +65,16 @@
 
       if (state === "installed") {
         if (isTopbar || isAuth) {
-          btn.classList.add("hidden"); // sudah terpasang: topbar & auth tidak perlu tombol
+          btn.classList.add("hidden");
         } else {
           if (icon) icon.className = "bi bi-check-circle-fill pwa-icon";
-          if (label) label.textContent = "Invenza Terpasang";
+          if (label) label.textContent = "App Installed";
           btn.disabled = true;
           btn.classList.add("sidebar-pwa-installed");
         }
       } else {
         if (icon) icon.className = "bi bi-download pwa-icon";
-        if (label) label.textContent = isTopbar ? "Install" : (isAuth ? "Install Invenza" : "Install Invenza");
+        if (label) label.textContent = isTopbar ? "Install" : (isAuth ? "Install App" : "Install App");
       }
     });
   }
@@ -98,21 +89,21 @@
 
     if (deferredPrompt) {
       const promptEvent = deferredPrompt;
-      deferredPrompt = null; // event hanya boleh dipakai sekali
+      deferredPrompt = null;
       promptEvent.prompt();
       const { outcome } = await promptEvent.userChoice;
       if (outcome === "accepted") {
         localStorage.setItem(FLAG, "1");
         render("installed");
       } else {
-        render("manual"); // user menolak; tetap tampil, klik lagi = instruksi
+        render("manual");
       }
       return;
     }
 
     if (!isSecureEnv()) {
       showHint(
-        "Install aplikasi hanya bisa dilakukan lewat alamat HTTPS (atau localhost). Buka Invenza dari alamat https:// hosting Anda, lalu tombol ini akan memasang aplikasi."
+        "Application install requires a secure HTTPS connection (or localhost). Please visit Invenza via HTTPS to install."
       );
       return;
     }
@@ -123,8 +114,6 @@
     if (!buttons().length) return;
 
     if (isStandalone() || localStorage.getItem(FLAG) === "1") {
-      // Jika flag ada tapi app dibuka di browser biasa (bukan standalone),
-      // anggap belum terpasang di sesi ini agar tombol tetap berguna.
       render(isStandalone() ? "installed" : "manual");
     } else {
       render(isSecureEnv() ? "manual" : "insecure");
@@ -142,7 +131,7 @@
       deferredPrompt = null;
       localStorage.setItem(FLAG, "1");
       render("installed");
-      if (typeof showToast === "function") showToast("Invenza berhasil diinstall!", "success");
+      if (typeof showToast === "function") showToast("Invenza installed successfully!", "success");
     });
   }
 

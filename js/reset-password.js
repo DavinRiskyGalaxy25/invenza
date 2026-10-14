@@ -1,10 +1,8 @@
 /* ==========================================================================
    INVENZA — Reset Password Page Logic
-   Halaman ini punya dua mode:
-   1. REQUEST mode: pengguna memasukkan email untuk menerima link reset.
-   2. UPDATE mode: pengguna datang dari link email Supabase dan membuat
-      password baru (terdeteksi lewat event PASSWORD_RECOVERY / access_token
-      pada URL yang otomatis ditangani supabase-js).
+   Supports two modes:
+   1. REQUEST mode: user inputs email to receive password reset link.
+   2. UPDATE mode: user arrives from Supabase recovery email link.
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -26,8 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     box.className = `auth-alert show ${type}`;
   }
 
-  // Supabase akan memicu event PASSWORD_RECOVERY ketika pengguna membuka
-  // link reset password dari email.
+  // Supabase triggers PASSWORD_RECOVERY when user opens recovery link from email
   supabaseClient.auth.onAuthStateChange((event) => {
     if (event === "PASSWORD_RECOVERY") {
       requestSection.classList.add("hidden");
@@ -35,7 +32,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Fallback: jika URL mengandung token type=recovery, tampilkan form update.
   if (window.location.hash.includes("type=recovery")) {
     requestSection.classList.add("hidden");
     updateSection.classList.remove("hidden");
@@ -43,75 +39,68 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  requestForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("reset-email").value.trim();
+  if (requestForm) {
+    requestForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("reset-email").value.trim();
 
-    if (!email) return showAlert(requestAlert, "Email wajib diisi.");
-    if (!EMAIL_REGEX.test(email)) return showAlert(requestAlert, "Format email tidak valid.");
+      if (!email) return showAlert(requestAlert, "Email address is required.");
+      if (!EMAIL_REGEX.test(email)) return showAlert(requestAlert, "Please enter a valid email address.");
 
-    setButtonLoading(requestSubmit, true, "Mengirim...");
+      setButtonLoading(requestSubmit, true, "Sending...");
 
-    const redirectTo = window.location.origin + window.location.pathname;
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-      redirectTo,
+      const redirectTo = window.location.origin + window.location.pathname;
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo,
+      });
+
+      setButtonLoading(requestSubmit, false);
+
+      if (error && !isTransientAuthError(error)) {
+        showAlert(requestAlert, translateError(error));
+        return;
+      }
+
+      showAlert(
+        requestAlert,
+        "If this email is registered, password reset instructions have been sent. Please check your inbox and spam folder.",
+        "success"
+      );
+      requestForm.reset();
     });
-
-    setButtonLoading(requestSubmit, false);
-
-    // PENTING (keamanan): JANGAN pernah membocorkan apakah suatu email
-    // terdaftar atau tidak di sistem. Supabase sendiri TIDAK mengembalikan
-    // error untuk email yang tidak terdaftar (supaya tidak bisa dipakai
-    // untuk enumerasi akun), jadi UI di sini juga selalu memakai pesan
-    // netral yang sama baik email tersebut terdaftar maupun tidak.
-    // Kita tidak pernah melakukan query ke auth.users dari browser, dan
-    // tidak pernah memakai Service Role Key di frontend untuk "memastikan"
-    // akun ada terlebih dulu.
-    if (error && !isTransientAuthError(error)) {
-      // Hanya tampilkan error untuk kegagalan teknis nyata (mis. rate limit,
-      // jaringan putus) — bukan untuk kasus "email tidak ditemukan".
-      showAlert(requestAlert, translateError(error));
-      return;
-    }
-
-    showAlert(
-      requestAlert,
-      "Jika email tersebut terdaftar, instruksi reset password akan dikirim. Silakan cek inbox (dan folder spam) Anda.",
-      "success"
-    );
-    requestForm.reset();
-  });
+  }
 
   function isTransientAuthError(error) {
     const msg = ((error && error.message) || "").toLowerCase();
-    // Error yang murni "user not found" / semacamnya tetap harus tampil netral.
     return msg.includes("user not found") || msg.includes("not found");
   }
 
-  updateForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const newPassword = document.getElementById("new-password").value;
-    const confirmPassword = document.getElementById("confirm-new-password").value;
+  if (updateForm) {
+    updateForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const newPassword = document.getElementById("new-password").value;
+      const confirmPassword = document.getElementById("confirm-new-password").value;
 
-    if (!newPassword || newPassword.length < 6) {
-      return showAlert(updateAlert, "Password minimal 6 karakter.");
-    }
-    if (newPassword !== confirmPassword) {
-      return showAlert(updateAlert, "Konfirmasi password tidak sama.");
-    }
+      if (!newPassword || newPassword.length < 6) {
+        return showAlert(updateAlert, "Password must be at least 6 characters.");
+      }
+      if (newPassword !== confirmPassword) {
+        return showAlert(updateAlert, "Passwords do not match.");
+      }
 
-    setButtonLoading(updateSubmit, true, "Menyimpan...");
+      setButtonLoading(updateSubmit, true, "Saving...");
 
-    const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+      const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
 
-    setButtonLoading(updateSubmit, false);
+      setButtonLoading(updateSubmit, false);
 
-    if (error) {
-      showAlert(updateAlert, translateError(error));
-      return;
-    }
+      if (error) {
+        showAlert(updateAlert, translateError(error));
+        return;
+      }
 
-    showAlert(updateAlert, "Password berhasil diperbarui. Mengalihkan ke login...", "success");
-    setTimeout(() => window.location.replace("login.html"), 1500);
-  });
+      showAlert(updateAlert, "Password updated successfully. Redirecting to sign in...", "success");
+      setTimeout(() => window.location.replace("login.html"), 1500);
+    });
+  }
 });

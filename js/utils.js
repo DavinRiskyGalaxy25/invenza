@@ -1,7 +1,7 @@
 /* ==========================================================================
-   INVENZA — Utilities
-   Fungsi bantuan yang dipakai bersama di seluruh halaman:
-   toast notification, format rupiah, status stok, modal helper, dsb.
+   INVENZA — Utilities (English Standard)
+   Helper functions shared across the application:
+   toast notifications, currency & date formatting, stock status, modals, etc.
    ========================================================================== */
 
 /* ---------- Toast Notification ---------- */
@@ -25,12 +25,13 @@ function showToast(message, type = "success", duration = 3500) {
   container.appendChild(toast);
   setTimeout(() => {
     toast.style.opacity = "0";
-    toast.style.transition = "opacity 0.25s ease";
+    toast.style.transform = "translateY(-8px) scale(0.96)";
+    toast.style.transition = "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)";
     setTimeout(() => toast.remove(), 250);
   }, duration);
 }
 
-/* ---------- Escaping (basic XSS safety for injected text) ---------- */
+/* ---------- Escaping (XSS Safety) ---------- */
 function escapeHtml(str) {
   if (str === null || str === undefined) return "";
   return String(str)
@@ -44,15 +45,16 @@ function escapeHtml(str) {
 /* ---------- Formatting ---------- */
 function formatRupiah(value) {
   const num = Number(value) || 0;
-  return "Rp" + num.toLocaleString("id-ID");
+  return "Rp " + num.toLocaleString("en-US");
 }
+const formatCurrency = formatRupiah;
 
 function formatDate(dateStr) {
   if (!dateStr) return "-";
   const d = new Date(dateStr);
-  return d.toLocaleDateString("id-ID", {
-    day: "2-digit",
-    month: "long",
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
@@ -62,13 +64,13 @@ function formatDate(dateStr) {
 /* ---------- Stock Status ---------- */
 function getStockStatus(stock) {
   const s = Number(stock);
-  if (s === 0) return { label: "Stok Habis", cls: "badge-danger", key: "habis" };
-  if (s <= LOW_STOCK_THRESHOLD) return { label: "Stok Menipis", cls: "badge-warning", key: "menipis" };
-  return { label: "Stok Aman", cls: "badge-success", key: "aman" };
+  if (s === 0) return { label: "Out of Stock", cls: "badge-danger", key: "out_of_stock" };
+  if (s <= LOW_STOCK_THRESHOLD) return { label: "Low Stock", cls: "badge-warning", key: "low_stock" };
+  return { label: "In Stock", cls: "badge-success", key: "in_stock" };
 }
 
-/* ---------- Button loading state ---------- */
-function setButtonLoading(btn, isLoading, loadingText = "Memproses...") {
+/* ---------- Button Loading State ---------- */
+function setButtonLoading(btn, isLoading, loadingText = "Processing...") {
   if (!btn) return;
   if (isLoading) {
     btn.dataset.originalText = btn.innerHTML;
@@ -80,44 +82,44 @@ function setButtonLoading(btn, isLoading, loadingText = "Memproses...") {
   }
 }
 
-/* ---------- Friendly error translation ---------- */
+/* ---------- Error Translation (English) ---------- */
 function translateError(err) {
   const msg = (err && err.message) ? err.message : String(err || "");
   const lower = msg.toLowerCase();
 
   if (lower.includes("invalid login credentials")) {
-    return "Email atau password salah, atau akun belum terdaftar.";
+    return "Invalid email or password.";
   }
   if (lower.includes("email not confirmed")) {
-    return "Email belum diverifikasi. Silakan cek inbox Anda.";
+    return "Email has not been verified. Please check your inbox.";
   }
   if (lower.includes("user already registered") || lower.includes("already registered")) {
-    return "Email sudah terdaftar. Silakan login.";
+    return "This email is already registered. Please sign in.";
   }
   if (lower.includes("duplicate key") && lower.includes("code")) {
-    return "Kode barang sudah digunakan.";
+    return "Product code is already in use.";
   }
   if (lower.includes("duplicate key")) {
-    return "Data yang sama sudah ada.";
+    return "Duplicate data record already exists.";
   }
   if (lower.includes("row-level security") || lower.includes("permission denied")) {
-    return "Anda tidak memiliki izin untuk melakukan aksi ini.";
+    return "Access denied. You do not have permission for this action.";
   }
   if (lower.includes("violates check constraint") || lower.includes("violates foreign key")) {
-    return "Data yang dimasukkan tidak valid. Silakan periksa kembali.";
+    return "Invalid data provided. Please verify all fields.";
   }
   if (lower.includes("failed to fetch") || lower.includes("networkerror") || lower.includes("network request failed")) {
-    return "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.";
+    return "Network connection issue. Operating in offline/cached mode.";
   }
   if (lower.includes("jwt") || lower.includes("session")) {
-    return "Sesi Anda telah berakhir. Silakan login kembali.";
+    return "Your session has expired. Please sign in again.";
   }
   if (msg) return msg;
-  return "Terjadi kesalahan. Silakan coba lagi.";
+  return "An unexpected error occurred. Please try again.";
 }
 
 /* ---------- Confirmation Dialog (Promise based) ---------- */
-function confirmDialog({ title = "Konfirmasi", message = "Apakah Anda yakin?", confirmText = "Ya", cancelText = "Batal", danger = true }) {
+function confirmDialog({ title = "Confirm Action", message = "Are you sure you want to proceed?", confirmText = "Confirm", cancelText = "Cancel", danger = true }) {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
     overlay.className = "modal-overlay";
@@ -127,7 +129,7 @@ function confirmDialog({ title = "Konfirmasi", message = "Apakah Anda yakin?", c
           <h3>${escapeHtml(title)}</h3>
         </div>
         <div class="modal-body">
-          <p style="margin:0; color:var(--color-text-muted); font-size:14px;">${escapeHtml(message)}</p>
+          <p style="margin:0; color:var(--color-text-muted); font-size:14px; line-height:1.5;">${escapeHtml(message)}</p>
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" data-action="cancel">${escapeHtml(cancelText)}</button>
@@ -149,7 +151,7 @@ function confirmDialog({ title = "Konfirmasi", message = "Apakah Anda yakin?", c
   });
 }
 
-/* ---------- Password show/hide toggle ---------- */
+/* ---------- Password Show/Hide Toggle ---------- */
 function initPasswordToggles(root = document) {
   root.querySelectorAll(".toggle-password").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -167,63 +169,121 @@ function initPasswordToggles(root = document) {
   });
 }
 
-/* ---------- Query param helper ---------- */
+/* ---------- Query Param Helper ---------- */
 function getQueryParam(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
 
-/* ---------- Unique filename for storage uploads ---------- */
+/* ---------- Unique Filename for Storage Uploads ---------- */
 function buildUniqueFileName(originalName) {
   const ext = originalName.includes(".") ? originalName.split(".").pop() : "jpg";
   const base = originalName.replace(/\.[^/.]+$/, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 30);
   const rand = Math.random().toString(36).slice(2, 9);
-  return `${base || "produk"}-${Date.now()}-${rand}.${ext}`;
+  return `${base || "product"}-${Date.now()}-${rand}.${ext}`;
 }
 
-/* ---------- Safe extension helper (never trust the raw filename) ---------- */
+/* ---------- Safe Image Extension Helper ---------- */
 function getSafeImageExtension(file) {
   const allowed = { "image/jpeg": "jpg", "image/jpg": "jpg", "image/png": "png", "image/webp": "webp" };
   return allowed[(file && file.type || "").toLowerCase()] || null;
 }
 
-/* ---------- Username validation ---------- */
+/* ---------- Username Validation ---------- */
 function validateUsername(raw) {
   const value = (raw || "").trim();
-  if (!value) return { valid: false, message: "Username wajib diisi." };
-  if (/\s/.test(value)) return { valid: false, message: "Username tidak boleh mengandung spasi." };
+  if (!value) return { valid: false, message: "Username is required." };
+  if (/\s/.test(value)) return { valid: false, message: "Username cannot contain spaces." };
   if (value.length < USERNAME_MIN_LENGTH || value.length > USERNAME_MAX_LENGTH) {
-    return { valid: false, message: `Username harus ${USERNAME_MIN_LENGTH}-${USERNAME_MAX_LENGTH} karakter.` };
+    return { valid: false, message: `Username must be ${USERNAME_MIN_LENGTH}-${USERNAME_MAX_LENGTH} characters.` };
   }
   if (!/^[a-zA-Z0-9_.]+$/.test(value)) {
-    return { valid: false, message: "Username hanya boleh berisi huruf, angka, titik, dan garis bawah." };
+    return { valid: false, message: "Username can only contain letters, numbers, dots, and underscores." };
   }
   return { valid: true, value };
 }
 
-/* ---------- Avatar file validation ---------- */
+/* ---------- Avatar File Validation ---------- */
 function validateAvatarFile(file) {
-  if (!file) return { valid: false, message: "Pilih file gambar terlebih dahulu." };
+  if (!file) return { valid: false, message: "Please select an image file." };
   const ext = getSafeImageExtension(file);
-  if (!ext) return { valid: false, message: "Format gambar tidak didukung. Gunakan JPG, PNG, atau WebP." };
+  if (!ext) return { valid: false, message: "Unsupported image format. Please use JPG, PNG, or WebP." };
   if (file.size > MAX_AVATAR_SIZE_MB * 1024 * 1024) {
-    return { valid: false, message: `Ukuran foto terlalu besar. Maksimal ${MAX_AVATAR_SIZE_MB}MB.` };
+    return { valid: false, message: `Image file is too large. Maximum size is ${MAX_AVATAR_SIZE_MB}MB.` };
   }
   return { valid: true, ext };
 }
 
-/* ---------- Auto-generate Kode Barang berdasarkan Kategori ----------
-   PENTING (lihat PRD #7): dipakai bersama oleh form Tambah/Edit Barang
-   (products.js) DAN fitur Import Data (import.js), supaya logikanya
-   tidak duplikat / berbeda-beda di tiap halaman.
-   Contoh: kategori "GPU" -> GPU-001, lalu GPU-002, dst.
-   TIDAK PERNAH menghasilkan "undefined-001", "null-001", atau "-001". */
+/* ---------- NexByte Game Store — Categories, Units & Code Generation ---------- */
+
+/**
+ * Predefined store categories with standard short code prefixes.
+ * Designed for NexByte Game Store (PC components, gaming gear, games, consoles).
+ */
+const STORE_CATEGORIES = [
+  // --- PC Components ---
+  { value: "CPU",            prefix: "CPU", label: "CPU / Processor",                group: "PC Components" },
+  { value: "GPU",            prefix: "GPU", label: "GPU / Graphics Card",            group: "PC Components" },
+  { value: "RAM",            prefix: "RAM", label: "RAM / Memory",                   group: "PC Components" },
+  { value: "Motherboard",    prefix: "MB",  label: "Motherboard",                    group: "PC Components" },
+  { value: "Power Supply",   prefix: "PSU", label: "Power Supply (PSU)",             group: "PC Components" },
+  { value: "Storage SSD",    prefix: "SSD", label: "Storage SSD / NVMe",             group: "PC Components" },
+  { value: "Storage HDD",    prefix: "HDD", label: "Storage Hard Disk",              group: "PC Components" },
+  { value: "PC Case",        prefix: "CSE", label: "PC Case / Casing",               group: "PC Components" },
+  { value: "Cooling / Fan",  prefix: "CLR", label: "Cooler & Fan",                   group: "PC Components" },
+
+  // --- Peripherals & Gear ---
+  { value: "Keyboard",       prefix: "KB",  label: "Keyboard",                       group: "Peripherals" },
+  { value: "Mouse",          prefix: "MS",  label: "Mouse",                          group: "Peripherals" },
+  { value: "Headset",        prefix: "HS",  label: "Headset & Earphone",             group: "Peripherals" },
+  { value: "Monitor",        prefix: "MON", label: "Monitor & Display",              group: "Peripherals" },
+  { value: "Mousepad",       prefix: "MP",  label: "Mousepad & Desk Mat",            group: "Peripherals" },
+  { value: "Controller",     prefix: "CTR", label: "Controller & Gamepad",           group: "Peripherals" },
+  { value: "Microphone",     prefix: "MIC", label: "Microphone",                     group: "Peripherals" },
+  { value: "Webcam",         prefix: "CAM", label: "Webcam & Camera",                group: "Peripherals" },
+  { value: "Speaker",        prefix: "SPK", label: "Gaming Speaker",                 group: "Peripherals" },
+
+  // --- Games (Digital & Physical) ---
+  { value: "Game PC",        prefix: "GPC", label: "Game PC (Steam / Epic / GOG)",   group: "Games" },
+  { value: "Game Console",   prefix: "GCN", label: "Game Console (Disc / Cartridge)",group: "Games" },
+  { value: "Digital Key",    prefix: "GDK", label: "Digital Key / CD-Key",           group: "Games" },
+  { value: "Voucher Game",   prefix: "VCH", label: "Voucher & Gift Card",            group: "Games" },
+
+  // --- Consoles & Hardware ---
+  { value: "Console",        prefix: "CNS", label: "Console (PS5, Xbox, Switch)",    group: "Consoles" },
+  { value: "Handheld",       prefix: "HND", label: "Handheld (Steam Deck, ROG)",     group: "Consoles" },
+
+  // --- Accessories & Others ---
+  { value: "Gaming Chair",   prefix: "CHR", label: "Gaming Chair",                   group: "Accessories" },
+  { value: "Cable & Adapter",prefix: "CBL", label: "Cable & Adapter",                group: "Accessories" },
+  { value: "Merchandise",    prefix: "MCH", label: "Merchandise & Collectibles",     group: "Accessories" },
+  { value: "Accessories",    prefix: "ACC", label: "Gaming Accessories",             group: "Accessories" },
+  { value: "Other",          prefix: "OTH", label: "Other",                          group: "Other" },
+];
+
+/**
+ * Predefined units of measurement for store products.
+ */
+const STORE_UNITS = [
+  { value: "Pcs",     label: "Pieces (Pcs)" },
+  { value: "Unit",    label: "Unit" },
+  { value: "Box",     label: "Box" },
+  { value: "Set",     label: "Set (Bundle)" },
+  { value: "Pack",    label: "Pack" },
+  { value: "Key",     label: "Digital Key / License" },
+  { value: "Voucher", label: "Voucher / Card" },
+  { value: "Pair",    label: "Pair" },
+];
+
+/** Build a short code prefix from the category using the predefined map. */
 function buildCategoryCodePrefix(category) {
-  const cleaned = (category || "")
-    .toString()
-    .trim()
-    .toUpperCase()
-    .replace(/[^A-Z0-9]+/g, "");
-  return cleaned || "BRG";
+  const cat = (category || "").toString().trim().toLowerCase();
+  const match = STORE_CATEGORIES.find(
+    (c) => c.value.toLowerCase() === cat
+  );
+  if (match) return match.prefix;
+  // Fallback: take first 3 uppercase letters
+  const cleaned = cat.toUpperCase().replace(/[^A-Z0-9]+/g, "");
+  return cleaned.substring(0, 3) || "PRD";
 }
 
 function generateProductCode(category, existingCodes) {
@@ -238,7 +298,7 @@ function generateProductCode(category, existingCodes) {
   return code;
 }
 
-/* ---------- PWA: Service Worker registration & Network Status ---------- */
+/* ---------- PWA: Service Worker Registration & Network Status ---------- */
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
@@ -249,22 +309,22 @@ if ("serviceWorker" in navigator) {
           if (newWorker) {
             newWorker.addEventListener("statechange", () => {
               if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-                showToast("Pembaruan aplikasi tersedia! Muat ulang halaman untuk menerapkan.", "info", 6000);
+                showToast("New update available! Reload to apply latest changes.", "info", 6000);
               }
             });
           }
         });
       })
       .catch((err) => {
-        console.warn("Registrasi service worker gagal:", err);
+        console.warn("Service worker registration failed:", err);
       });
   });
 }
 
 window.addEventListener("online", () => {
-  showToast("Koneksi internet kembali aktif.", "success", 3000);
+  showToast("Internet connection restored.", "success", 3000);
 });
 
 window.addEventListener("offline", () => {
-  showToast("Koneksi terputus. Invenza berjalan dalam mode offline.", "info", 5000);
+  showToast("Offline mode active. Invenza is running from local cache.", "info", 5000);
 });

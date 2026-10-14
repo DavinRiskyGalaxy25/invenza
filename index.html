@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Invenza — Sistem Inventaris Barang</title>
-  <meta name="description" content="Invenza — Sistem Inventaris Barang sederhana berbasis Supabase.">
-  <meta name="theme-color" content="#37A5FF">
+  <title>Invenza — NexByte Game Store Inventory</title>
+  <meta name="description" content="Invenza — Inventory management system for NexByte Game Store.">
+  <meta name="theme-color" content="#38BDF8">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icons/favicon.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
@@ -18,14 +18,13 @@
 </head>
 <body>
 
-  <!-- ============ SPLASH SCREEN (bukan halaman terpisah, murni HTML/CSS/JS) ============ -->
+  <!-- ============ SPLASH SCREEN ============ -->
   <div id="splash-screen">
-    <img src="assets/icons/icon-192.png" alt="Logo Invenza" class="splash-logo">
+    <img src="assets/icons/icon-192.png" alt="Invenza Logo" class="splash-logo">
     <div class="splash-name">Invenza</div>
-    <div class="splash-tagline">Sistem Inventaris Barang</div>
-    <div class="splash-store-sub">For NexByte Game Store</div>
+    <div class="splash-tagline">NexByte Game Store — Inventory System</div>
     <div class="splash-loader"></div>
-    <div class="splash-dev">Dikembangkan oleh Nexora</div>
+    <div class="splash-dev">Designed &amp; Engineered by Nexora</div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -33,8 +32,7 @@
   <script src="js/supabase.js"></script>
   <script src="js/utils.js"></script>
   <script>
-    // Tampilkan splash minimal beberapa detik, lalu cek session dan redirect.
-    const MIN_SPLASH_MS = 1600;
+    const MIN_SPLASH_MS = 1400;
     const startTime = Date.now();
 
     async function routeAfterSplash() {
@@ -45,7 +43,7 @@
           destination = "dashboard.html";
         }
       } catch (err) {
-        console.warn("Gagal memeriksa session:", err);
+        console.warn("Failed to check auth session:", err);
       }
 
       const elapsed = Date.now() - startTime;
@@ -53,10 +51,10 @@
 
       setTimeout(() => {
         const splash = document.getElementById("splash-screen");
-        splash.classList.add("fade-out");
+        if (splash) splash.classList.add("fade-out");
         setTimeout(() => {
           window.location.replace(destination);
-        }, 400);
+        }, 350);
       }, remaining);
     }
 

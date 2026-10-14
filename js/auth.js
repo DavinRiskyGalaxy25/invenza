@@ -1,17 +1,15 @@
 /* ==========================================================================
-   INVENZA — Auth Guard
-   Fungsi reusable untuk melindungi halaman internal (dashboard, products,
-   product-detail) dari akses tanpa login, serta menangani logout dan
-   pergantian status sesi secara real-time.
+   INVENZA — Auth Guard & User Session (English Standard)
+   Protects authenticated pages, handles real-time auth changes,
+   user profile loading, and logout workflow.
    ========================================================================== */
 
 let currentSession = null;
 let currentProfile = null;
 
 /**
- * Dipanggil di setiap halaman yang butuh login.
- * Jika tidak ada session aktif -> redirect ke login.html
- * Jika ada -> resolve dengan objek session.
+ * Required on protected pages.
+ * Redirects to login.html if session is invalid.
  */
 async function requireAuth() {
   const { data, error } = await supabaseClient.auth.getSession();
@@ -23,7 +21,7 @@ async function requireAuth() {
 
   currentSession = data.session;
 
-  // Dengarkan perubahan status auth (misalnya token expired / logout di tab lain)
+  // Listen to auth state changes (e.g. token expired, signout from another tab)
   supabaseClient.auth.onAuthStateChange((event, session) => {
     if (event === "SIGNED_OUT" || !session) {
       window.location.replace("login.html");
@@ -36,10 +34,8 @@ async function requireAuth() {
 }
 
 /**
- * Ambil user_id pengguna yang sedang login langsung dari Supabase Auth.
- * PENTING: digunakan sebagai satu-satunya sumber user_id untuk seluruh
- * query/insert data inventaris — JANGAN pernah mengambil user_id dari
- * input HTML atau state lain yang bisa dimanipulasi.
+ * Get current authenticated user ID.
+ * Features automatic offline fallback to local cached session.
  */
 async function getCurrentUserId() {
   try {
@@ -52,11 +48,9 @@ async function getCurrentUserId() {
       return user.id;
     }
   } catch (err) {
-    // Mode offline: network request gagal, lanjut ke session lokal
-    console.warn("Pemeriksaan user online gagal, mencoba session lokal:", err);
+    console.warn("Online user verification skipped, using local session:", err);
   }
 
-  // Fallback offline: gunakan session yang sudah tersimpan di localStorage
   if (currentSession && currentSession.user && currentSession.user.id) {
     return currentSession.user.id;
   }
@@ -68,7 +62,7 @@ async function getCurrentUserId() {
       return data.session.user.id;
     }
   } catch (err) {
-    console.warn("Gagal membaca session lokal:", err);
+    console.warn("Failed to retrieve local session:", err);
   }
 
   window.location.replace("login.html");
@@ -76,7 +70,7 @@ async function getCurrentUserId() {
 }
 
 /**
- * Ambil profil pengguna (tabel profiles) untuk ditampilkan di navbar.
+ * Load user profile from public.profiles table.
  */
 async function loadCurrentProfile() {
   if (!currentSession) return null;
@@ -87,7 +81,7 @@ async function loadCurrentProfile() {
     .single();
 
   if (error) {
-    console.warn("Gagal memuat profil:", error.message);
+    console.warn("Profile fetch fallback:", error.message);
     currentProfile = {
       full_name: currentSession.user.user_metadata?.full_name || currentSession.user.email,
       email: currentSession.user.email,
@@ -99,7 +93,7 @@ async function loadCurrentProfile() {
 }
 
 /**
- * Redirect pengguna yang SUDAH login menjauh dari halaman login/signup.
+ * Redirect user if already logged in (used on login / signup pages).
  */
 async function redirectIfLoggedIn(destination = "dashboard.html") {
   const { data } = await supabaseClient.auth.getSession();
@@ -111,14 +105,14 @@ async function redirectIfLoggedIn(destination = "dashboard.html") {
 }
 
 /**
- * Logout pengguna dan kembali ke login.html
+ * Handle user sign out with confirmation modal.
  */
 async function handleLogout() {
   const confirmed = await confirmDialog({
-    title: "Logout",
-    message: "Apakah Anda yakin ingin keluar dari akun ini?",
-    confirmText: "Logout",
-    cancelText: "Batal",
+    title: "Sign Out",
+    message: "Are you sure you want to sign out of Invenza?",
+    confirmText: "Sign Out",
+    cancelText: "Cancel",
     danger: true,
   });
   if (!confirmed) return;
@@ -132,17 +126,27 @@ async function handleLogout() {
 }
 
 /**
- * Nama tampilan pengguna: prioritaskan username, lalu full_name, lalu email.
- * Dipakai di navbar dan halaman profil supaya konsisten.
+ * Get formatted display name (prioritizing username).
  */
 function getDisplayName(profile) {
-  if (!profile) return "Pengguna";
-  return (profile.username && profile.username.trim()) || profile.full_name || profile.email || "Pengguna";
+  if (!profile && !currentSession?.user) return "User";
+  const userMeta = currentSession?.user?.user_metadata;
+  const username = (profile && profile.username && profile.username.trim()) ||
+                   (userMeta && userMeta.username && userMeta.username.trim());
+  if (username) return username;
+
+  const fullName = (profile && profile.full_name && profile.full_name.trim()) ||
+                   (userMeta && userMeta.full_name && userMeta.full_name.trim());
+  if (fullName) return fullName;
+
+  const email = (profile && profile.email) || currentSession?.user?.email;
+  if (email) return email.split("@")[0];
+
+  return "User";
 }
 
 /**
- * Render foto profil (jika ada avatar_url) atau inisial huruf sebagai fallback
- * ke dalam elemen avatar manapun (navbar, halaman profil, dsb).
+ * Render avatar image or initial fallback into an element.
  */
 function renderAvatarInto(el, profile, fallbackName) {
   if (!el) return;
@@ -150,7 +154,7 @@ function renderAvatarInto(el, profile, fallbackName) {
   const name = fallbackName || getDisplayName(profile);
   const initial = name.trim().charAt(0).toUpperCase();
   if (url) {
-    el.innerHTML = `<img src="${escapeHtml(url)}" alt="Foto profil" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    el.innerHTML = `<img src="${escapeHtml(url)}" alt="Avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
     const img = el.querySelector("img");
     if (img) {
       img.addEventListener("error", () => {
@@ -163,21 +167,32 @@ function renderAvatarInto(el, profile, fallbackName) {
 }
 
 /**
- * Inisialisasi elemen navbar umum (nama user, inisial avatar, tombol logout)
- * pada halaman-halaman yang dilindungi.
+ * Initialize navbar & sidebar user widgets and event listeners.
  */
 function initUserNavbar() {
-  const nameEl = document.getElementById("navbar-user-name");
-  const avatarEl = document.getElementById("navbar-user-avatar");
-  if (currentProfile) {
-    const name = getDisplayName(currentProfile);
-    if (nameEl) nameEl.textContent = name;
-    if (avatarEl) renderAvatarInto(avatarEl, currentProfile, name);
-  }
+  const name = currentProfile ? getDisplayName(currentProfile) : "User";
+
+  // Topbar
+  const topbarName = document.getElementById("navbar-user-name");
+  const topbarAvatar = document.getElementById("navbar-user-avatar");
+  if (topbarName) topbarName.textContent = name;
+  if (topbarAvatar) renderAvatarInto(topbarAvatar, currentProfile, name);
+
+  // Sidebar User Card (Inspired by Purple Dashboard)
+  const sidebarName = document.getElementById("sidebar-user-name");
+  const sidebarAvatar = document.getElementById("sidebar-user-avatar");
+  if (sidebarName) sidebarName.textContent = name;
+  if (sidebarAvatar) renderAvatarInto(sidebarAvatar, currentProfile, name);
+
+  // Welcome Banner (if on dashboard)
+  const welcomeName = document.getElementById("welcome-name");
+  if (welcomeName) welcomeName.textContent = name;
+
+  // Logout button
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) logoutBtn.addEventListener("click", handleLogout);
 
-  // Sidebar toggle untuk mobile
+  // Mobile sidebar drawer
   const menuToggle = document.getElementById("menu-toggle");
   const sidebar = document.getElementById("sidebar");
   const overlay = document.getElementById("sidebar-overlay");

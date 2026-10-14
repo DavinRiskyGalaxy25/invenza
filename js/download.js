@@ -1,13 +1,6 @@
 /* ==========================================================================
    INVENZA — Download Data Page Logic
-   Export data inventaris milik user yang sedang login saja (JSON, Excel).
-   PENTING: Tidak pernah melakukan export seluruh database — setiap query
-   selalu difilter dengan user_id milik akun yang sedang login.
-
-   Catatan (PRD patch — hapus Export SQL): fitur Export SQL (PostgreSQL),
-   Export SQL (MySQL), dan Backup LocalStorage sengaja DIHAPUS dan TIDAK
-   BOLEH dihidupkan kembali. Hanya Export JSON dan Export Excel yang
-   disediakan di halaman ini.
+   Export inventory datasets scoped strictly to authenticated user's account.
    ========================================================================== */
 
 let myProducts = [];
@@ -19,8 +12,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await loadMyProductsForExport();
 
-  document.getElementById("download-json-btn").addEventListener("click", downloadAsJson);
-  document.getElementById("download-excel-btn").addEventListener("click", downloadAsExcel);
+  const jsonBtn = document.getElementById("download-json-btn");
+  const excelBtn = document.getElementById("download-excel-btn");
+  if (jsonBtn) jsonBtn.addEventListener("click", downloadAsJson);
+  if (excelBtn) excelBtn.addEventListener("click", downloadAsExcel);
 });
 
 async function loadMyProductsForExport() {
@@ -38,12 +33,14 @@ async function loadMyProductsForExport() {
     if (error) throw error;
 
     myProducts = data || [];
-    infoEl.textContent = myProducts.length
-      ? `${myProducts.length} barang siap untuk di-export.`
-      : "Belum ada data barang untuk di-export.";
+    if (infoEl) {
+      infoEl.textContent = myProducts.length
+        ? `${myProducts.length} inventory item${myProducts.length === 1 ? "" : "s"} ready for export.`
+        : "No inventory records available to export.";
+    }
   } catch (err) {
     console.error(err);
-    infoEl.textContent = "Gagal memuat data.";
+    if (infoEl) infoEl.textContent = "Failed to load catalog count.";
     showToast(translateError(err), "error");
   }
 }
@@ -72,7 +69,7 @@ function triggerFileDownload(content, fileName, mimeType) {
 
 function downloadAsJson() {
   if (!myProducts.length) {
-    showToast("Belum ada data untuk di-export.", "error");
+    showToast("No inventory records found to export.", "error");
     return;
   }
   const exportData = myProducts.map((p) => ({
@@ -92,43 +89,42 @@ function downloadAsJson() {
     updated_at: p.updated_at,
   }));
   const json = JSON.stringify(exportData, null, 2);
-  triggerFileDownload(json, `invenza-data-${todayStamp()}.json`, "application/json");
-  showToast("File JSON berhasil diunduh");
+  triggerFileDownload(json, `invenza-inventory-${todayStamp()}.json`, "application/json");
+  showToast("JSON dataset exported successfully", "success");
 }
 
 /* ---------- Excel Export ---------- */
 
 function downloadAsExcel() {
   if (!myProducts.length) {
-    showToast("Belum ada data untuk di-export.", "error");
+    showToast("No inventory records found to export.", "error");
     return;
   }
   if (typeof XLSX === "undefined") {
-    showToast("Gagal memuat pustaka Excel. Periksa koneksi internet Anda.", "error");
+    showToast("Excel generator library is not loaded. Please verify internet connection.", "error");
     return;
   }
 
   const rows = myProducts.map((p) => ({
-    ID: p.id,
-    Kode: p.code,
-    "Nama Barang": p.name,
-    Kategori: p.category,
-    Harga: Number(p.price) || 0,
-    Stok: Number(p.stock) || 0,
-    Satuan: p.unit,
-    Supplier: p.supplier,
-    "Publisher Game": p.publisher || "",
-    Kondisi: p.kondisi || "",
-    "Lokasi Barang": p.lokasi || "",
-    Catatan: p.catatan || "",
-    Gambar: p.image_url || "",
-    "Tanggal Dibuat": formatDate(p.created_at),
-    "Tanggal Diubah": formatDate(p.updated_at),
+    "Item Code": p.code,
+    "Product Name": p.name,
+    "Category": p.category,
+    "Unit Price (IDR)": Number(p.price) || 0,
+    "Stock Quantity": Number(p.stock) || 0,
+    "Unit": p.unit,
+    "Supplier": p.supplier,
+    "Brand / Publisher": p.publisher || "",
+    "Condition": p.kondisi || "",
+    "Storage Location": p.lokasi || "",
+    "Notes & Remarks": p.catatan || "",
+    "Image URL": p.image_url || "",
+    "Date Created": formatDate(p.created_at),
+    "Date Modified": formatDate(p.updated_at),
   }));
 
   const worksheet = XLSX.utils.json_to_sheet(rows);
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Data Barang");
-  XLSX.writeFile(workbook, `invenza-data-${todayStamp()}.xlsx`);
-  showToast("File Excel berhasil diunduh");
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Inventory Catalog");
+  XLSX.writeFile(workbook, `invenza-inventory-${todayStamp()}.xlsx`);
+  showToast("Excel spreadsheet exported successfully", "success");
 }

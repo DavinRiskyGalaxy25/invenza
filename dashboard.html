@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Dashboard — Invenza</title>
-  <meta name="theme-color" content="#37A5FF">
+  <meta name="theme-color" content="#38BDF8">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icons/favicon.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
@@ -12,128 +12,269 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Invenza">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/style.css?v=20">
+  <link rel="stylesheet" href="css/dashboard.css?v=20">
 </head>
 <body>
 
   <div class="app-shell">
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
+    <!-- ============ SIDEBAR ============ -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
-        <img src="assets/icons/icon-192.png" alt="Invenza" style="width:30px;height:30px;border-radius:8px;">
+        <img src="assets/icons/icon-192.png" alt="Invenza" style="width:32px;height:32px;border-radius:10px;">
         Invenza
       </div>
+
+      <!-- User Profile Card in Sidebar (Purple Theme Inspired) -->
+      <a href="profile.html" class="sidebar-user-card" title="View Profile">
+        <div class="sidebar-user-avatar" id="sidebar-user-avatar">A</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-user-name">User</div>
+          <div class="sidebar-user-role">Inventory Admin</div>
+        </div>
+        <span class="user-status-dot" title="Active"></span>
+      </a>
+
+      <!-- Navigation Menu -->
       <nav class="sidebar-nav">
-        <a href="dashboard.html" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
-        <a href="products.html"><i class="bi bi-box-seam"></i> Data Barang</a>
-        <a href="about.html"><i class="bi bi-info-circle"></i> About</a>
+        <a href="dashboard.html" class="active"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+        <a href="products.html"><i class="bi bi-box-seam"></i> Inventory</a>
         <a href="import.html"><i class="bi bi-cloud-arrow-up"></i> Import Data</a>
-        <a href="download.html"><i class="bi bi-download"></i> Download Data</a>
-        <a href="profile.html"><i class="bi bi-person-circle"></i> Profil Saya</a>
+        <a href="download.html"><i class="bi bi-cloud-arrow-down"></i> Export Data</a>
+        <a href="profile.html"><i class="bi bi-person-circle"></i> My Profile</a>
+        <a href="about.html"><i class="bi bi-info-circle"></i> About Invenza</a>
       </nav>
+
       <div class="sidebar-footer">
         <button id="install-pwa-nav-btn" data-pwa-install="sidebar" class="btn btn-secondary btn-block sidebar-pwa-btn" type="button">
           <i class="bi bi-download pwa-icon"></i>
-          <span class="pwa-label">Install Invenza</span>
+          <span class="pwa-label">Install App</span>
         </button>
-        <button id="logout-btn" class="btn btn-secondary btn-block"><i class="bi bi-box-arrow-right"></i> Logout</button>
+        <button id="logout-btn" class="btn btn-secondary btn-block"><i class="bi bi-box-arrow-right"></i> Sign Out</button>
       </div>
     </aside>
 
+    <!-- ============ MAIN CONTENT ============ -->
     <div class="main-content">
+      <!-- Topbar Header -->
       <header class="topbar">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <button id="menu-toggle" class="menu-toggle"><i class="bi bi-list"></i></button>
+        <div class="topbar-left">
+          <button id="menu-toggle" class="menu-toggle" aria-label="Toggle Navigation"><i class="bi bi-list"></i></button>
           <div class="topbar-title">Dashboard</div>
-        </div><div class="topbar-right">
+
+          <!-- Quick Search -->
+          <div class="topbar-search">
+            <i class="bi bi-search"></i>
+            <input type="text" id="topbar-search-input" placeholder="Search inventory items...">
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Install Button on Mobile -->
           <button id="install-pwa-topbar-btn" data-pwa-install="topbar" class="btn btn-primary topbar-install-btn" type="button" aria-label="Install Invenza">
             <i class="bi bi-download pwa-icon"></i><span class="pwa-label">Install</span>
           </button>
-          <a href="profile.html" class="topbar-user" title="Profil Saya">
-          <div class="user-avatar" id="navbar-user-avatar">U</div>
-          <span id="navbar-user-name">Pengguna</span>
-        </a>
+
+          <!-- Notification Bell -->
+          <a href="products.html" class="topbar-action-btn" title="Low Stock Notifications">
+            <i class="bi bi-bell"></i>
+            <span class="topbar-action-badge hidden" id="low-stock-dot"></span>
+          </a>
+
+          <!-- Fullscreen Toggle -->
+          <button class="topbar-action-btn" id="fullscreen-toggle" title="Toggle Fullscreen" type="button">
+            <i class="bi bi-arrows-fullscreen"></i>
+          </button>
+
+          <!-- User Badge -->
+          <a href="profile.html" class="topbar-user" title="My Profile">
+            <div class="user-avatar" id="navbar-user-avatar">A</div>
+            <span id="navbar-user-name">Admin</span>
+          </a>
         </div>
       </header>
 
+      <!-- Page Body -->
       <main class="page-body">
+
+        <!-- Welcome Banner (with Custom Glassmorphism Background) -->
         <div class="welcome-banner">
-          <h2>Halo, <span id="welcome-name">Pengguna</span></h2>
-          <p>Berikut ringkasan kondisi inventaris toko Anda hari ini.</p>
+          <div class="welcome-banner-content">
+            <h2><span id="welcome-salute">Hello</span>, <span id="welcome-name">User</span>!</h2>
+            <p id="welcome-sub-greeting">What would you like to log today?</p>
+          </div>
+          <div class="welcome-banner-actions">
+            <a href="products.html" class="btn"><i class="bi bi-box-arrow-up-right"></i> Manage Inventory</a>
+          </div>
         </div>
 
+        <!-- 4 Vibrant Glass Stat Cards (Purple Theme Inspired) -->
         <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon blue"><i class="bi bi-box-seam"></i></div>
-            <div>
+          <!-- Card 1: Total Products -->
+          <div class="stat-card card-blue">
+            <i class="bi bi-box-seam stat-watermark"></i>
+            <div class="stat-header">
+              <div class="stat-title">Total Products</div>
               <div class="stat-value" id="stat-total-barang">0</div>
-              <div class="stat-label">Total Barang</div>
+            </div>
+            <div class="stat-footer">
+              <i class="bi bi-check2-circle"></i> Active catalog records
             </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon green"><i class="bi bi-archive"></i></div>
-            <div>
+
+          <!-- Card 2: Total Stock Volume -->
+          <div class="stat-card card-green">
+            <i class="bi bi-archive stat-watermark"></i>
+            <div class="stat-header">
+              <div class="stat-title">Stock Volume</div>
               <div class="stat-value" id="stat-total-stok">0</div>
-              <div class="stat-label">Total Stok</div>
+            </div>
+            <div class="stat-footer">
+              <i class="bi bi-arrow-up-right"></i> Total units in warehouse
             </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon orange"><i class="bi bi-tags"></i></div>
-            <div>
+
+          <!-- Card 3: Categories -->
+          <div class="stat-card card-purple">
+            <i class="bi bi-tags stat-watermark"></i>
+            <div class="stat-header">
+              <div class="stat-title">Categories</div>
               <div class="stat-value" id="stat-kategori">0</div>
-              <div class="stat-label">Jumlah Kategori</div>
+            </div>
+            <div class="stat-footer">
+              <i class="bi bi-diagram-3"></i> Organized product groups
             </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon red"><i class="bi bi-exclamation-triangle"></i></div>
-            <div>
+
+          <!-- Card 4: Low / Out of Stock -->
+          <div class="stat-card card-coral">
+            <i class="bi bi-exclamation-triangle stat-watermark"></i>
+            <div class="stat-header">
+              <div class="stat-title">Critical Stock</div>
               <div class="stat-value" id="stat-menipis">0</div>
-              <div class="stat-label">Barang Stok Menipis/Habis</div>
+            </div>
+            <div class="stat-footer">
+              <i class="bi bi-bell"></i> Items requiring restock
             </div>
           </div>
         </div>
 
+        <!-- Charts Grid (Visual Bar Chart & Donut Chart) -->
+        <div class="charts-grid">
+          <!-- Bar Chart Card: Category Analytics -->
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3 class="chart-title"><i class="bi bi-bar-chart-line-fill" style="color:var(--color-primary-dark);margin-right:8px;"></i>Category Analytics</h3>
+              <div class="chart-legends">
+                <span class="chart-legend-item"><span class="chart-legend-color" style="background:#38BDF8;"></span> Products</span>
+                <span class="chart-legend-item"><span class="chart-legend-color" style="background:#7C3AED;"></span> Units</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="chart-canvas-wrap" id="bar-chart-wrap">
+                <!-- Dynamically generated bars via dashboard.js -->
+                <div class="bar-chart-container" id="bar-chart-container">
+                  <div style="margin:auto;color:var(--color-text-muted);font-size:13px;">Analyzing categories...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Donut Chart Card: Stock Health Distribution -->
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3 class="chart-title"><i class="bi bi-pie-chart-fill" style="color:#7C3AED;margin-right:8px;"></i>Stock Health</h3>
+            </div>
+            <div class="card-body">
+              <div class="donut-wrap">
+                <div class="donut-svg-box">
+                  <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg);">
+                    <!-- Background circle -->
+                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(241, 245, 249, 0.8)" stroke-width="3.6" />
+                    <!-- Slices rendered dynamically by dashboard.js -->
+                    <path id="donut-slice-safe" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#10B981" stroke-width="4.2" stroke-dasharray="75, 100" />
+                    <path id="donut-slice-low" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#F59E0B" stroke-width="4.2" stroke-dasharray="15, 100" stroke-dashoffset="-75" />
+                    <path id="donut-slice-out" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#EF4444" stroke-width="4.2" stroke-dasharray="10, 100" stroke-dashoffset="-90" />
+                  </svg>
+                  <div class="donut-inner-text">
+                    <span class="donut-inner-value" id="donut-total-count">0</span>
+                    <span class="donut-inner-label">Items</span>
+                  </div>
+                </div>
+
+                <!-- Donut Legend Table -->
+                <div class="donut-legend-list">
+                  <div class="donut-legend-row">
+                    <span style="display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:#10B981;"></span> In Stock</span>
+                    <span id="donut-safe-count">0</span>
+                  </div>
+                  <div class="donut-legend-row">
+                    <span style="display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:#F59E0B;"></span> Low Stock</span>
+                    <span id="donut-low-count">0</span>
+                  </div>
+                  <div class="donut-legend-row">
+                    <span style="display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:#EF4444;"></span> Out of Stock</span>
+                    <span id="donut-out-count">0</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity & Recent Inventory Tables -->
         <div class="dashboard-grid">
+          <!-- Recent Products -->
           <div class="card">
             <div class="card-header">
-              <h3>Barang Terbaru</h3>
-              <a href="products.html">Lihat semua →</a>
+              <h3>Recent Inventory</h3>
+              <a href="products.html" style="font-size:13.5px;font-weight:600;">View All Inventory &rarr;</a>
             </div>
             <div class="card-body" style="padding:0;">
               <div style="overflow-x:auto;">
                 <table class="mini-table">
                   <thead>
-                    <tr><th>Kode</th><th>Nama</th><th>Harga</th><th>Stok</th></tr>
+                    <tr>
+                      <th>Code</th>
+                      <th>Product Name</th>
+                      <th>Unit Price</th>
+                      <th>Stock</th>
+                    </tr>
                   </thead>
                   <tbody id="recent-products-body">
-                    <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--color-text-muted);">Memuat data...</td></tr>
+                    <tr><td colspan="4" style="text-align:center;padding:26px;color:var(--color-text-muted);">Loading inventory...</td></tr>
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
 
+          <!-- Attention Needed / Critical Stock -->
           <div class="card">
             <div class="card-header">
-              <h3>Perlu Perhatian</h3>
+              <h3>Stock Alerts</h3>
             </div>
             <div class="card-body" style="padding:0;">
               <table class="mini-table">
                 <thead>
-                  <tr><th>Nama Barang</th><th>Status</th></tr>
+                  <tr>
+                    <th>Item</th>
+                    <th>Status</th>
+                  </tr>
                 </thead>
                 <tbody id="low-stock-body">
-                  <tr><td colspan="2" style="text-align:center;padding:20px;color:var(--color-text-muted);">Memuat data...</td></tr>
+                  <tr><td colspan="2" style="text-align:center;padding:26px;color:var(--color-text-muted);">Verifying stock...</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
         </div>
       </main>
+
       <footer class="app-footer">
-        &copy; 2026 Invenza &middot; Developed by <strong>Nexora</strong>
+        &copy; 2026 Invenza &middot; Smart Inventory Management System
       </footer>
     </div>
   </div>
@@ -144,6 +285,6 @@
   <script src="js/utils.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/pwa.js"></script>
-  <script src="js/dashboard.js"></script>
+  <script src="js/dashboard.js?v=20"></script>
 </body>
 </html>

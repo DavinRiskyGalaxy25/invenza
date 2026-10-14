@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>About — Invenza</title>
-  <meta name="theme-color" content="#37A5FF">
+  <meta name="theme-color" content="#38BDF8">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icons/favicon.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
@@ -20,93 +20,110 @@
   <div class="app-shell">
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
+    <!-- ============ SIDEBAR ============ -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
-        <img src="assets/icons/icon-192.png" alt="Invenza" style="width:30px;height:30px;border-radius:8px;">
+        <img src="assets/icons/icon-192.png" alt="Invenza" style="width:32px;height:32px;border-radius:10px;">
         Invenza
       </div>
+
+      <!-- User Profile Card in Sidebar -->
+      <a href="profile.html" class="sidebar-user-card" title="View Profile">
+        <div class="sidebar-user-avatar" id="sidebar-user-avatar">A</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-user-name">User</div>
+          <div class="sidebar-user-role">Inventory Admin</div>
+        </div>
+        <span class="user-status-dot" title="Active"></span>
+      </a>
+
+      <!-- Navigation Menu -->
       <nav class="sidebar-nav">
-        <a href="dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
-        <a href="products.html"><i class="bi bi-box-seam"></i> Data Barang</a>
-        <a href="about.html" class="active"><i class="bi bi-info-circle"></i> About</a>
+        <a href="dashboard.html"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+        <a href="products.html"><i class="bi bi-box-seam"></i> Inventory</a>
         <a href="import.html"><i class="bi bi-cloud-arrow-up"></i> Import Data</a>
-        <a href="download.html"><i class="bi bi-download"></i> Download Data</a>
-        <a href="profile.html"><i class="bi bi-person-circle"></i> Profil Saya</a>
+        <a href="download.html"><i class="bi bi-cloud-arrow-down"></i> Export Data</a>
+        <a href="profile.html"><i class="bi bi-person-circle"></i> My Profile</a>
+        <a href="about.html" class="active"><i class="bi bi-info-circle"></i> About Invenza</a>
       </nav>
+
       <div class="sidebar-footer">
         <button id="install-pwa-nav-btn" data-pwa-install="sidebar" class="btn btn-secondary btn-block sidebar-pwa-btn" type="button">
           <i class="bi bi-download pwa-icon"></i>
-          <span class="pwa-label">Install Invenza</span>
+          <span class="pwa-label">Install App</span>
         </button>
-        <button id="logout-btn" class="btn btn-secondary btn-block"><i class="bi bi-box-arrow-right"></i> Logout</button>
+        <button id="logout-btn" class="btn btn-secondary btn-block"><i class="bi bi-box-arrow-right"></i> Sign Out</button>
       </div>
     </aside>
 
+    <!-- ============ MAIN CONTENT ============ -->
     <div class="main-content">
       <header class="topbar">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <button id="menu-toggle" class="menu-toggle"><i class="bi bi-list"></i></button>
-          <div class="topbar-title">About</div>
-        </div><div class="topbar-right">
+        <div class="topbar-left">
+          <button id="menu-toggle" class="menu-toggle" aria-label="Toggle Navigation"><i class="bi bi-list"></i></button>
+          <div class="topbar-title">About Invenza</div>
+        </div>
+
+        <div class="topbar-right">
           <button id="install-pwa-topbar-btn" data-pwa-install="topbar" class="btn btn-primary topbar-install-btn" type="button" aria-label="Install Invenza">
             <i class="bi bi-download pwa-icon"></i><span class="pwa-label">Install</span>
           </button>
-          <a href="profile.html" class="topbar-user" title="Profil Saya">
-          <div class="user-avatar" id="navbar-user-avatar">U</div>
-          <span id="navbar-user-name">Pengguna</span>
-        </a>
+
+          <a href="products.html" class="topbar-action-btn" title="View Inventory">
+            <i class="bi bi-box-seam"></i>
+          </a>
+
+          <button class="topbar-action-btn" id="fullscreen-toggle" title="Toggle Fullscreen" type="button">
+            <i class="bi bi-arrows-fullscreen"></i>
+          </button>
+
+          <a href="profile.html" class="topbar-user" title="My Profile">
+            <div class="user-avatar" id="navbar-user-avatar">A</div>
+            <span id="navbar-user-name">Admin</span>
+          </a>
         </div>
       </header>
 
       <main class="page-body">
 
+        <!-- Glass Hero Header with 3D fluid artwork backdrop -->
         <div class="about-hero">
-          <img src="assets/icons/icon-192.png" alt="Logo Invenza">
+          <img src="assets/icons/icon-192.png" alt="Invenza Logo">
           <div>
             <h2>Invenza</h2>
-            <p>Invenza adalah aplikasi manajemen inventaris yang membantu toko dan bisnis dalam mencatat, mengelola, dan memantau barang secara lebih terorganisir.</p>
+            <p>The official inventory management system for NexByte Game Store — built to streamline stock tracking for game keys, consoles, peripherals, and electronics.</p>
           </div>
         </div>
 
         <div class="card about-section">
           <div class="card-body">
-            <h3><i class="bi bi-box-seam"></i> Apa itu Invenza?</h3>
+            <h3><i class="bi bi-box-seam"></i> What is Invenza?</h3>
             <p>
-              Invenza membantu Anda mencatat barang, mengelola stok, melihat detail inventaris,
-              mencari barang dengan cepat, dan mengelola seluruh data inventaris secara digital —
-              langsung dari browser, di desktop maupun mobile. Setiap akun memiliki data
-              inventarisnya sendiri yang terpisah dan aman dari akun lain.
-            </p>
-            <p>
-              Invenza pada awalnya dikembangkan untuk mendukung kebutuhan inventaris
-              <strong>Toko Game NexByte</strong>. Namun, Invenza tidak terbatas hanya untuk NexByte —
-              aplikasi ini terbuka dan dapat digunakan oleh toko atau bisnis lain yang membutuhkan
-              sistem manajemen inventaris, seperti toko retail, toko elektronik, toko komputer,
-              maupun bisnis kecil dan menengah lainnya.
+              Invenza is the dedicated inventory platform for NexByte Game Store. It provides real-time stock monitoring, automated product code generation, and powerful import/export capabilities for managing game keys, gaming hardware, peripherals, and electronics across desktop and mobile.
             </p>
             <ul class="feature-list">
-              <li><i class="bi bi-journal-plus"></i> Mencatat barang baru dengan mudah</li>
-              <li><i class="bi bi-graph-up"></i> Mengelola dan memantau stok</li>
-              <li><i class="bi bi-eye"></i> Melihat detail lengkap tiap barang</li>
-              <li><i class="bi bi-search"></i> Mencari & memfilter barang dengan cepat</li>
-              <li><i class="bi bi-shield-lock"></i> Data terisolasi & aman per akun</li>
-              <li><i class="bi bi-download"></i> Export data kapan saja dibutuhkan</li>
-              <li><i class="bi bi-person-circle"></i> Kelola profil, username & foto akun</li>
-              <li><i class="bi bi-phone"></i> Install sebagai aplikasi (PWA)</li>
+              <li><i class="bi bi-journal-plus"></i> Effortless item recording with image uploads</li>
+              <li><i class="bi bi-graph-up"></i> Real-time stock distribution & status telemetry</li>
+              <li><i class="bi bi-eye"></i> In-depth product specification views</li>
+              <li><i class="bi bi-search"></i> High-speed multi-criteria search and category filters</li>
+              <li><i class="bi bi-shield-lock"></i> Granular multi-tenant data isolation via Row Level Security</li>
+              <li><i class="bi bi-download"></i> Universal Excel and JSON dataset export</li>
+              <li><i class="bi bi-person-circle"></i> Granular profile, avatar, and credential management</li>
+              <li><i class="bi bi-phone"></i> Offline-capable Progressive Web Application (PWA)</li>
             </ul>
           </div>
         </div>
 
         <div class="card about-section">
           <div class="card-body">
-            <h3><i class="bi bi-cpu"></i> Teknologi yang Digunakan</h3>
+            <h3><i class="bi bi-cpu"></i> Technology Architecture</h3>
             <div class="tech-badges">
-              <span class="tech-badge"><i class="bi bi-filetype-html"></i> HTML</span>
-              <span class="tech-badge"><i class="bi bi-filetype-css"></i> CSS</span>
-              <span class="tech-badge"><i class="bi bi-filetype-js"></i> JavaScript</span>
+              <span class="tech-badge"><i class="bi bi-filetype-html"></i> Semantic HTML5</span>
+              <span class="tech-badge"><i class="bi bi-filetype-css"></i> Glassmorphism CSS</span>
+              <span class="tech-badge"><i class="bi bi-filetype-js"></i> Modern ES6+</span>
               <span class="tech-badge"><i class="bi bi-bootstrap"></i> Bootstrap Icons</span>
-              <span class="tech-badge"><i class="bi bi-lightning-charge"></i> Supabase</span>
-              <span class="tech-badge"><i class="bi bi-phone"></i> PWA</span>
+              <span class="tech-badge"><i class="bi bi-lightning-charge"></i> Supabase Cloud DB</span>
+              <span class="tech-badge"><i class="bi bi-phone"></i> PWA Service Worker</span>
             </div>
           </div>
         </div>
@@ -114,11 +131,10 @@
         <div class="card about-section">
           <div class="card-body">
             <div class="credits-intro">
-              <div class="credits-eyebrow">Invenza — Inventory Management Application</div>
-              <div class="credits-brand">Developed by Nexora</div>
-              <p style="max-width:520px;margin:10px auto 0;color:var(--color-text-muted);font-size:13.5px;line-height:1.6;">
-                Nexora Development Team &middot; awalnya dikembangkan untuk Toko Game NexByte,
-                kini terbuka untuk digunakan toko/bisnis lain.
+              <div class="credits-eyebrow">Invenza Platform</div>
+              <div class="credits-brand">Developed by Nexora Engineering</div>
+              <p style="max-width:560px;margin:10px auto 0;color:var(--color-text-muted);font-size:13.5px;line-height:1.6;">
+                Built by the Nexora team for NexByte Game Store — delivering clean, accessible, and dependable inventory technology.
               </p>
             </div>
             <div class="credits-grid">
@@ -135,8 +151,9 @@
         </div>
 
       </main>
+
       <footer class="app-footer">
-        &copy; 2026 Invenza &middot; Developed by <strong>Nexora</strong>
+        &copy; 2026 Invenza &middot; NexByte Game Store Inventory
       </footer>
     </div>
   </div>

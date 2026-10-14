@@ -6,7 +6,7 @@
    di sini karena bersifat dinamis/real-time.
    ========================================================================== */
 
-const CACHE_NAME = "invenza-cache-v7";
+const CACHE_NAME = "invenza-cache-v20";
 
 const APP_SHELL = [
   "./",
@@ -47,6 +47,12 @@ const APP_SHELL = [
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
   "./assets/icons/favicon.png",
+  "./assets/images/glass-bg-1.jpg",
+  "./assets/images/glass-bg-2.jpg",
+  "./assets/images/glass-bg-3.jpg",
+  "./assets/images/glass-bg-4.jpg",
+  "./assets/images/glass-bg-5.jpg",
+  "./assets/images/glass-bg-6.jpg",
   // Pustaka eksternal penting agar PWA dapat berjalan offline
   "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js",
   "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css",

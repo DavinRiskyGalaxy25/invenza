@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Download Data — Invenza</title>
-  <meta name="theme-color" content="#37A5FF">
+  <title>Export Data — Invenza</title>
+  <meta name="theme-color" content="#38BDF8">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icons/favicon.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
@@ -20,78 +20,110 @@
   <div class="app-shell">
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
+    <!-- ============ SIDEBAR ============ -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
-        <img src="assets/icons/icon-192.png" alt="Invenza" style="width:30px;height:30px;border-radius:8px;">
+        <img src="assets/icons/icon-192.png" alt="Invenza" style="width:32px;height:32px;border-radius:10px;">
         Invenza
       </div>
+
+      <!-- User Profile Card in Sidebar -->
+      <a href="profile.html" class="sidebar-user-card" title="View Profile">
+        <div class="sidebar-user-avatar" id="sidebar-user-avatar">A</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-user-name">User</div>
+          <div class="sidebar-user-role">Inventory Admin</div>
+        </div>
+        <span class="user-status-dot" title="Active"></span>
+      </a>
+
+      <!-- Navigation Menu -->
       <nav class="sidebar-nav">
-        <a href="dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
-        <a href="products.html"><i class="bi bi-box-seam"></i> Data Barang</a>
-        <a href="about.html"><i class="bi bi-info-circle"></i> About</a>
+        <a href="dashboard.html"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+        <a href="products.html"><i class="bi bi-box-seam"></i> Inventory</a>
         <a href="import.html"><i class="bi bi-cloud-arrow-up"></i> Import Data</a>
-        <a href="download.html" class="active"><i class="bi bi-download"></i> Download Data</a>
-        <a href="profile.html"><i class="bi bi-person-circle"></i> Profil Saya</a>
+        <a href="download.html" class="active"><i class="bi bi-cloud-arrow-down"></i> Export Data</a>
+        <a href="profile.html"><i class="bi bi-person-circle"></i> My Profile</a>
+        <a href="about.html"><i class="bi bi-info-circle"></i> About Invenza</a>
       </nav>
+
       <div class="sidebar-footer">
         <button id="install-pwa-nav-btn" data-pwa-install="sidebar" class="btn btn-secondary btn-block sidebar-pwa-btn" type="button">
           <i class="bi bi-download pwa-icon"></i>
-          <span class="pwa-label">Install Invenza</span>
+          <span class="pwa-label">Install App</span>
         </button>
-        <button id="logout-btn" class="btn btn-secondary btn-block"><i class="bi bi-box-arrow-right"></i> Logout</button>
+        <button id="logout-btn" class="btn btn-secondary btn-block"><i class="bi bi-box-arrow-right"></i> Sign Out</button>
       </div>
     </aside>
 
+    <!-- ============ MAIN CONTENT ============ -->
     <div class="main-content">
       <header class="topbar">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <button id="menu-toggle" class="menu-toggle"><i class="bi bi-list"></i></button>
-          <div class="topbar-title">Download Data</div>
-        </div><div class="topbar-right">
+        <div class="topbar-left">
+          <button id="menu-toggle" class="menu-toggle" aria-label="Toggle Navigation"><i class="bi bi-list"></i></button>
+          <div class="topbar-title">Export Data</div>
+        </div>
+
+        <div class="topbar-right">
           <button id="install-pwa-topbar-btn" data-pwa-install="topbar" class="btn btn-primary topbar-install-btn" type="button" aria-label="Install Invenza">
             <i class="bi bi-download pwa-icon"></i><span class="pwa-label">Install</span>
           </button>
-          <a href="profile.html" class="topbar-user" title="Profil Saya">
-          <div class="user-avatar" id="navbar-user-avatar">U</div>
-          <span id="navbar-user-name">Pengguna</span>
-        </a>
+
+          <a href="products.html" class="topbar-action-btn" title="View Inventory">
+            <i class="bi bi-box-seam"></i>
+          </a>
+
+          <button class="topbar-action-btn" id="fullscreen-toggle" title="Toggle Fullscreen" type="button">
+            <i class="bi bi-arrows-fullscreen"></i>
+          </button>
+
+          <a href="profile.html" class="topbar-user" title="My Profile">
+            <div class="user-avatar" id="navbar-user-avatar">A</div>
+            <span id="navbar-user-name">Admin</span>
+          </a>
         </div>
       </header>
 
       <main class="page-body">
         <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>Export Catalog Records</h3>
+              <p style="font-size:0.84rem;color:var(--color-text-muted);margin-top:2px;">Download your live inventory datasets for analytics, reporting, and offline backup</p>
+            </div>
+          </div>
           <div class="card-body">
             <p class="download-intro">
-              Download data inventaris kamu dalam format JSON atau Excel. Data yang diunduh
-              hanya berisi barang milik akun yang sedang login, diambil langsung dari
-              database (Supabase) terbaru — bukan dari cache lokal browser.
+              Export your inventory records anytime in structured JSON or spreadsheet Excel (.xlsx) formats.
+              Downloads pull fresh records directly from the cloud database, ensuring full consistency.
             </p>
 
             <div class="download-grid">
               <div class="download-card">
                 <div class="download-icon"><i class="bi bi-filetype-json"></i></div>
-                <h4>JSON (Database)</h4>
-                <p>Data terbaru dari Supabase, cocok untuk dipakai kembali di aplikasi atau script lain.</p>
-                <button id="download-json-btn" class="btn btn-primary"><i class="bi bi-download"></i> Download JSON</button>
+                <h4>JSON Dataset</h4>
+                <p>Structured raw JSON format ideal for programmatic workflows, external integrations, or backups.</p>
+                <button id="download-json-btn" class="btn btn-primary"><i class="bi bi-download"></i> Export JSON</button>
               </div>
 
               <div class="download-card">
                 <div class="download-icon"><i class="bi bi-file-earmark-spreadsheet"></i></div>
-                <h4>Excel</h4>
-                <p>Spreadsheet .xlsx siap dibuka di Excel, Google Sheets, atau aplikasi sejenis. Termasuk kolom Gambar (URL).</p>
-                <button id="download-excel-btn" class="btn btn-primary"><i class="bi bi-download"></i> Download Excel</button>
+                <h4>Microsoft Excel (.xlsx)</h4>
+                <p>Clean tabular spreadsheet compatible with Microsoft Excel, Apple Numbers, and Google Sheets.</p>
+                <button id="download-excel-btn" class="btn btn-primary"><i class="bi bi-download"></i> Export Excel</button>
               </div>
             </div>
 
             <div class="download-summary">
               <i class="bi bi-info-circle"></i>
-              <span id="download-count-info">Memuat jumlah data...</span>
+              <span id="download-count-info">Calculating available records...</span>
             </div>
           </div>
         </div>
       </main>
+
       <footer class="app-footer">
-        &copy; 2026 Invenza &middot; Developed by <strong>Nexora</strong>
+        &copy; 2026 Invenza &middot; Modern Inventory Management
       </footer>
     </div>
   </div>

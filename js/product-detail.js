@@ -28,9 +28,9 @@ async function loadProductDetail(id) {
   const contentEl = document.getElementById("detail-content");
   const notFoundEl = document.getElementById("detail-not-found");
 
-  loadingEl.classList.remove("hidden");
-  contentEl.classList.add("hidden");
-  notFoundEl.classList.add("hidden");
+  if (loadingEl) loadingEl.classList.remove("hidden");
+  if (contentEl) contentEl.classList.add("hidden");
+  if (notFoundEl) notFoundEl.classList.add("hidden");
 
   try {
     const userId = await getCurrentUserId();
@@ -50,59 +50,78 @@ async function loadProductDetail(id) {
 
     currentProduct = data;
     renderDetail(data);
-    contentEl.classList.remove("hidden");
+    if (contentEl) contentEl.classList.remove("hidden");
   } catch (err) {
     console.error(err);
     showToast(translateError(err), "error");
     showNotFound();
   } finally {
-    loadingEl.classList.add("hidden");
+    if (loadingEl) loadingEl.classList.add("hidden");
   }
 }
 
 function showNotFound() {
-  document.getElementById("detail-loading").classList.add("hidden");
-  document.getElementById("detail-content").classList.add("hidden");
-  document.getElementById("detail-not-found").classList.remove("hidden");
+  const loadingEl = document.getElementById("detail-loading");
+  const contentEl = document.getElementById("detail-content");
+  const notFoundEl = document.getElementById("detail-not-found");
+  if (loadingEl) loadingEl.classList.add("hidden");
+  if (contentEl) contentEl.classList.add("hidden");
+  if (notFoundEl) notFoundEl.classList.remove("hidden");
 }
 
 function renderDetail(p) {
-  document.getElementById("detail-page-title").textContent = p.name;
+  const pageTitle = document.getElementById("detail-page-title");
+  if (pageTitle) pageTitle.textContent = `${p.name} — Invenza`;
 
   const imageWrap = document.getElementById("detail-image-wrap");
-  imageWrap.innerHTML = p.image_url
-    ? `<img src="${escapeHtml(p.image_url)}" class="detail-image" alt="${escapeHtml(p.name)}">`
-    : `<div class="detail-image-placeholder"><i class="bi bi-box-seam"></i></div>`;
+  if (imageWrap) {
+    imageWrap.innerHTML = p.image_url
+      ? `<img src="${escapeHtml(p.image_url)}" class="detail-image" alt="${escapeHtml(p.name)}">`
+      : `<div class="detail-image-placeholder"><i class="bi bi-box-seam"></i></div>`;
+  }
 
-  document.getElementById("detail-name").textContent = p.name;
-  document.getElementById("detail-code").textContent = `Kode: ${p.code}`;
+  const nameEl = document.getElementById("detail-name");
+  if (nameEl) nameEl.textContent = p.name;
+
+  const codeEl = document.getElementById("detail-code");
+  if (codeEl) codeEl.textContent = `Item Code: ${p.code}`;
 
   const status = getStockStatus(p.stock);
-  document.getElementById("detail-status-badge").innerHTML = `<span class="badge ${status.cls}">${status.label}</span>`;
+  const statusColors = {
+    "badge-success": "#059669",
+    "badge-warning": "#D97706",
+    "badge-danger": "#DC2626"
+  };
+  const statusColor = statusColors[status.cls] || "#059669";
+  const badgeEl = document.getElementById("detail-status-badge");
+  if (badgeEl) badgeEl.innerHTML = `<span class="status-text ${status.cls}" style="font-size:13px;font-weight:700;color:${statusColor};background:none!important;background-color:transparent!important;padding:0;border:none;">${status.label}</span>`;
 
-  document.getElementById("detail-category").textContent = p.category || "-";
-  document.getElementById("detail-price").textContent = formatRupiah(p.price);
-  document.getElementById("detail-stock").textContent = `${p.stock} ${p.unit || ""}`;
-  document.getElementById("detail-supplier").textContent = p.supplier || "-";
-  // Field baru (publisher/kondisi/lokasi/catatan): data lama mungkin belum
-  // mempunyai kolom ini terisi — jangan pernah crash, tampilkan fallback.
-  document.getElementById("detail-publisher").textContent = p.publisher || "-";
-  document.getElementById("detail-kondisi").textContent = p.kondisi || "Belum diisi";
-  document.getElementById("detail-lokasi").textContent = p.lokasi || "-";
-  document.getElementById("detail-catatan").textContent = p.catatan || "-";
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val || "-";
+  };
 
-  document.getElementById("detail-created").textContent = formatDate(p.created_at);
-  document.getElementById("detail-updated").textContent = formatDate(p.updated_at);
+  setVal("detail-category", p.category);
+  setVal("detail-price", formatRupiah(p.price));
+  setVal("detail-stock", `${p.stock} ${p.unit || ""}`);
+  setVal("detail-supplier", p.supplier);
+  setVal("detail-publisher", p.publisher);
+  setVal("detail-kondisi", p.kondisi || "Standard / Good");
+  setVal("detail-lokasi", p.lokasi);
+  setVal("detail-catatan", p.catatan);
+
+  setVal("detail-created", formatDate(p.created_at));
+  setVal("detail-updated", formatDate(p.updated_at));
 }
 
 async function deleteFromDetail(id) {
   if (!currentProduct) return;
 
   const confirmed = await confirmDialog({
-    title: "Hapus Barang",
-    message: `Apakah Anda yakin ingin menghapus "${currentProduct.name}"? Tindakan ini tidak dapat dibatalkan.`,
-    confirmText: "Hapus",
-    cancelText: "Batal",
+    title: "Delete Product",
+    message: `Are you sure you want to delete "${currentProduct.name}"? This action cannot be undone.`,
+    confirmText: "Delete",
+    cancelText: "Cancel",
     danger: true,
   });
   if (!confirmed) return;
@@ -122,8 +141,8 @@ async function deleteFromDetail(id) {
       }
     }
 
-    showToast("Barang berhasil dihapus");
-    setTimeout(() => window.location.replace("products.html"), 800);
+    showToast("Product deleted successfully", "success");
+    setTimeout(() => window.location.replace("products.html"), 600);
   } catch (err) {
     console.error(err);
     showToast(translateError(err), "error");

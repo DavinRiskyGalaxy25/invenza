@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Import Data — Invenza</title>
-  <meta name="theme-color" content="#37A5FF">
+  <meta name="theme-color" content="#38BDF8">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icons/favicon.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
@@ -20,144 +20,173 @@
   <div class="app-shell">
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
+    <!-- ============ SIDEBAR ============ -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
-        <img src="assets/icons/icon-192.png" alt="Invenza" style="width:30px;height:30px;border-radius:8px;">
+        <img src="assets/icons/icon-192.png" alt="Invenza" style="width:32px;height:32px;border-radius:10px;">
         Invenza
       </div>
+
+      <!-- User Profile Card in Sidebar -->
+      <a href="profile.html" class="sidebar-user-card" title="View Profile">
+        <div class="sidebar-user-avatar" id="sidebar-user-avatar">A</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-user-name">User</div>
+          <div class="sidebar-user-role">Inventory Admin</div>
+        </div>
+        <span class="user-status-dot" title="Active"></span>
+      </a>
+
+      <!-- Navigation Menu -->
       <nav class="sidebar-nav">
-        <a href="dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
-        <a href="products.html"><i class="bi bi-box-seam"></i> Data Barang</a>
-        <a href="about.html"><i class="bi bi-info-circle"></i> About</a>
+        <a href="dashboard.html"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+        <a href="products.html"><i class="bi bi-box-seam"></i> Inventory</a>
         <a href="import.html" class="active"><i class="bi bi-cloud-arrow-up"></i> Import Data</a>
-        <a href="download.html"><i class="bi bi-download"></i> Download Data</a>
-        <a href="profile.html"><i class="bi bi-person-circle"></i> Profil Saya</a>
+        <a href="download.html"><i class="bi bi-cloud-arrow-down"></i> Export Data</a>
+        <a href="profile.html"><i class="bi bi-person-circle"></i> My Profile</a>
+        <a href="about.html"><i class="bi bi-info-circle"></i> About Invenza</a>
       </nav>
+
       <div class="sidebar-footer">
         <button id="install-pwa-nav-btn" data-pwa-install="sidebar" class="btn btn-secondary btn-block sidebar-pwa-btn" type="button">
           <i class="bi bi-download pwa-icon"></i>
-          <span class="pwa-label">Install Invenza</span>
+          <span class="pwa-label">Install App</span>
         </button>
-        <button id="logout-btn" class="btn btn-secondary btn-block"><i class="bi bi-box-arrow-right"></i> Logout</button>
+        <button id="logout-btn" class="btn btn-secondary btn-block"><i class="bi bi-box-arrow-right"></i> Sign Out</button>
       </div>
     </aside>
 
+    <!-- ============ MAIN CONTENT ============ -->
     <div class="main-content">
       <header class="topbar">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <button id="menu-toggle" class="menu-toggle"><i class="bi bi-list"></i></button>
+        <div class="topbar-left">
+          <button id="menu-toggle" class="menu-toggle" aria-label="Toggle Navigation"><i class="bi bi-list"></i></button>
           <div class="topbar-title">Import Data</div>
-        </div><div class="topbar-right">
+        </div>
+
+        <div class="topbar-right">
           <button id="install-pwa-topbar-btn" data-pwa-install="topbar" class="btn btn-primary topbar-install-btn" type="button" aria-label="Install Invenza">
             <i class="bi bi-download pwa-icon"></i><span class="pwa-label">Install</span>
           </button>
-          <a href="profile.html" class="topbar-user" title="Profil Saya">
-          <div class="user-avatar" id="navbar-user-avatar">U</div>
-          <span id="navbar-user-name">Pengguna</span>
-        </a>
+
+          <a href="products.html" class="topbar-action-btn" title="View Inventory">
+            <i class="bi bi-box-seam"></i>
+          </a>
+
+          <button class="topbar-action-btn" id="fullscreen-toggle" title="Toggle Fullscreen" type="button">
+            <i class="bi bi-arrows-fullscreen"></i>
+          </button>
+
+          <a href="profile.html" class="topbar-user" title="My Profile">
+            <div class="user-avatar" id="navbar-user-avatar">A</div>
+            <span id="navbar-user-name">Admin</span>
+          </a>
         </div>
       </header>
 
       <main class="page-body">
         <div class="card">
           <div class="card-header">
-            <h3>Import Data Barang</h3>
+            <div>
+              <h3>Import Inventory Records</h3>
+              <p style="font-size:0.84rem;color:var(--color-text-muted);margin-top:2px;">Upload existing spreadsheets or JSON datasets to batch-populate your catalog</p>
+            </div>
           </div>
           <div class="card-body">
             <p class="download-intro">
-              Import data barang dari file Excel (.xlsx/.xls), CSV (.csv), atau JSON (.json).
-              Semua data yang berhasil diimport akan otomatis tersimpan ke akun Anda yang sedang
-              login — data pada file (termasuk kolom <code>user_id</code> jika ada) tidak pernah
-              digunakan untuk menentukan pemilik data; pemilik selalu ditentukan dari sesi login
-              Anda saat ini.
+              Import products seamlessly from Excel (.xlsx/.xls), CSV (.csv), or JSON (.json) files.
+              All parsed products are securely saved to your active workspace account.
             </p>
 
             <div class="import-format-box">
-              <h4><i class="bi bi-info-circle"></i> Format Kolom File Import</h4>
-              <p>Gunakan nama kolom berikut pada baris pertama file Excel/CSV Anda:</p>
+              <h4><i class="bi bi-info-circle"></i> File Header Schema & Guidelines</h4>
+              <p>Ensure the first header row of your spreadsheet matches the column structure below:</p>
               <div class="import-format-scroll">
-                <code class="import-format-cols">Kode | Nama Barang | Kategori | Harga | Stok | Satuan | Supplier | Publisher | Kondisi | Lokasi | Catatan | Gambar</code>
+                <code class="import-format-cols">Code | Product Name | Category | Price | Stock | Unit | Supplier | Brand | Condition | Location | Notes | Image URL</code>
               </div>
               <ul class="import-format-list">
-                <li><strong>Nama Barang</strong> dan <strong>Kategori</strong> wajib diisi.</li>
-                <li>Kolom lainnya boleh dikosongkan jika tidak diperlukan.</li>
-                <li>Jika <strong>Kode</strong> dikosongkan, kode barang dibuat otomatis berdasarkan Kategori.</li>
-                <li>Nilai <strong>Kondisi</strong> yang valid: <code>Bagus</code>, <code>Rusak Ringan</code>, <code>Rusak</code>.</li>
-                <li><strong>Gambar</strong> opsional, isi dengan URL gambar (mis. <code>https://...</code>). Boleh dikosongkan; jika URL tidak valid, barang tetap diimport tanpa gambar.</li>
-                <li>Untuk file <strong>JSON</strong>, gunakan nama properti <code>image_url</code> atau <code>gambar_url</code>.</li>
+                <li><strong>Product Name</strong> and <strong>Category</strong> are required fields.</li>
+                <li>Other columns are optional and can be left blank if not available.</li>
+                <li>If <strong>Code</strong> is empty, item codes are automatically generated based on the category.</li>
+                <li>Valid <strong>Condition</strong> values: <code>Good</code> (or <code>New</code>/<code>Good</code>), <code>Fair</code> (or <code>Fair</code>), <code>Damaged</code> (or <code>Damaged</code>).</li>
+                <li><strong>Image URL</strong> is optional (must be a valid <code>https://...</code> image link).</li>
               </ul>
               <details class="import-format-example">
-                <summary>Lihat contoh baris data</summary>
+                <summary>View sample data row</summary>
                 <div class="import-format-scroll">
-                  <code>GPU-001 | RTX 3060 | GPU | 4500000 | 5 | Unit | ASUS | NVIDIA | Bagus | Rak A1 | Barang baru | https://example.com/rtx3060.jpg</code>
+                  <code>GPU-001 | RTX 4070 | Graphics Card | 8900000 | 8 | Unit | ASUS ROG | NVIDIA | Bagus | Rack A-02 | Brand new in box | https://example.com/rtx4070.jpg</code>
                 </div>
               </details>
             </div>
 
+            <!-- Upload Dropzone -->
             <div class="import-dropzone" id="import-drop-wrap">
               <i class="bi bi-cloud-arrow-up"></i>
-              <div><strong>Klik untuk pilih file</strong></div>
-              <div class="import-dropzone-hint">Format didukung: .xlsx, .xls, .csv, .json</div>
+              <div><strong>Click or drag &amp; drop file to upload</strong></div>
+              <div class="import-dropzone-hint">Supported formats: .xlsx, .xls, .csv, .json</div>
               <div class="import-dropzone-filename" id="import-filename"></div>
               <input type="file" id="import-file-input" accept=".xlsx,.xls,.csv,.json" class="hidden">
             </div>
 
             <div id="import-error-box" class="form-error" style="margin-top:10px;"></div>
 
+            <!-- Preview Section -->
             <div id="import-preview-section" class="hidden" style="margin-top:24px;">
-              <h4 style="margin:0 0 4px;">Preview Data (<span id="import-preview-count">0</span> baris)</h4>
+              <h4 style="margin:0 0 6px;">Data Preview (<span id="import-preview-count">0</span> rows detected)</h4>
               <p class="import-preview-note">
-                Baris dengan tanda <span class="badge badge-danger">Error</span> akan dilewati saat import.
-                Baris tanpa Kode Barang akan dibuatkan kode otomatis berdasarkan kategori.
+                Rows with <span class="badge badge-danger">Error</span> tags will be excluded from import.
+                Items without codes will receive auto-generated identifiers.
               </p>
               <div class="import-preview-wrap">
                 <table class="products-table" id="import-preview-table">
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>Kode</th>
-                      <th>Nama</th>
-                      <th>Kategori</th>
-                      <th>Harga</th>
-                      <th>Stok</th>
-                      <th>Kondisi</th>
-                      <th>Gambar</th>
+                      <th>Code</th>
+                      <th>Product Name</th>
+                      <th>Category</th>
+                      <th>Price</th>
+                      <th>Stock</th>
+                      <th>Condition</th>
+                      <th>Image</th>
                       <th>Status</th>
                     </tr>
                   </thead>
                   <tbody id="import-preview-body"></tbody>
                 </table>
               </div>
-              <div class="import-actions">
-                <button id="import-confirm-btn" class="btn btn-primary"><i class="bi bi-upload"></i> Import Sekarang</button>
-                <button id="import-cancel-btn" class="btn btn-secondary" type="button">Batal</button>
+              <div class="import-actions" style="margin-top:18px;display:flex;gap:12px;">
+                <button id="import-confirm-btn" class="btn btn-primary"><i class="bi bi-upload"></i> Confirm &amp; Import</button>
+                <button id="import-cancel-btn" class="btn btn-secondary" type="button">Cancel</button>
               </div>
             </div>
 
+            <!-- Result Section -->
             <div id="import-result-section" class="hidden" style="margin-top:24px;">
-              <h4 style="margin:0 0 12px;">Hasil Import</h4>
+              <h4 style="margin:0 0 14px;">Import Results</h4>
               <div class="import-result-grid">
                 <div class="import-result-chip success">
                   <div class="import-result-value" id="result-success">0</div>
-                  <div class="import-result-label">Berhasil diimport</div>
+                  <div class="import-result-label">Imported Successfully</div>
                 </div>
                 <div class="import-result-chip warning">
                   <div class="import-result-value" id="result-skipped">0</div>
-                  <div class="import-result-label">Dilewati (duplikat)</div>
+                  <div class="import-result-label">Skipped (Duplicate Code)</div>
                 </div>
                 <div class="import-result-chip danger">
                   <div class="import-result-value" id="result-failed">0</div>
-                  <div class="import-result-label">Error</div>
+                  <div class="import-result-label">Failed / Invalid</div>
                 </div>
               </div>
-              <a href="products.html" class="btn btn-primary" style="margin-top:16px;display:inline-flex;">Lihat Data Barang</a>
+              <a href="products.html" class="btn btn-primary" style="margin-top:20px;display:inline-flex;">View Inventory Directory</a>
             </div>
 
           </div>
         </div>
       </main>
+
       <footer class="app-footer">
-        &copy; 2026 Invenza &middot; Developed by <strong>Nexora</strong>
+        &copy; 2026 Invenza &middot; Modern Inventory Management
       </footer>
     </div>
   </div>

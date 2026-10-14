@@ -1,9 +1,9 @@
 {
   "id": "/",
-  "name": "Invenza - Sistem Inventaris Barang",
+  "name": "Invenza - NexByte Game Store Inventory",
   "short_name": "Invenza",
-  "description": "Aplikasi Sistem Inventaris Barang untuk membantu pemilik dan karyawan toko mengelola data barang.",
-  "lang": "id",
+  "description": "Inventory management system for NexByte Game Store. Manage game keys, consoles, peripherals, and electronics.",
+  "lang": "en",
   "dir": "ltr",
   "start_url": "./index.html",
   "scope": "./",
@@ -14,8 +14,8 @@
     "minimal-ui"
   ],
   "orientation": "any",
-  "background_color": "#F5FAFF",
-  "theme_color": "#37A5FF",
+  "background_color": "#F8FAFC",
+  "theme_color": "#38BDF8",
   "categories": [
     "business",
     "productivity",
@@ -43,9 +43,9 @@
   ],
   "shortcuts": [
     {
-      "name": "Data Barang",
-      "short_name": "Barang",
-      "description": "Buka katalog dan daftar barang inventaris",
+      "name": "Inventory Catalog",
+      "short_name": "Inventory",
+      "description": "Browse catalog and stock items directory",
       "url": "./products.html",
       "icons": [
         {
@@ -57,7 +57,7 @@
     {
       "name": "Dashboard",
       "short_name": "Dashboard",
-      "description": "Buka ringkasan statistik stok toko",
+      "description": "View real-time stock analytics and metrics",
       "url": "./dashboard.html",
       "icons": [
         {
@@ -69,8 +69,20 @@
     {
       "name": "Import Data",
       "short_name": "Import",
-      "description": "Import data barang dari Excel atau CSV",
+      "description": "Import items from Excel, CSV, or JSON",
       "url": "./import.html",
+      "icons": [
+        {
+          "src": "assets/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Export Data",
+      "short_name": "Export",
+      "description": "Export items to Excel or JSON",
+      "url": "./download.html",
       "icons": [
         {
           "src": "assets/icons/icon-192.png",

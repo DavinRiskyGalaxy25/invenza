@@ -1,37 +1,39 @@
 /* ==========================================================================
-   INVENZA — Import Data page styles
+   INVENZA — Import Data Page Styles (Borderless Glassmorphism)
    ========================================================================== */
 
-/* ---------- Format Kolom (petunjuk) ---------- */
+/* ---------- Format Kolom (Petunjuk) ---------- */
 .import-format-box {
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 14px 16px;
-  margin-top: 16px;
+  background: rgba(241, 245, 249, 0.6);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-top: 18px;
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
 }
 .import-format-box h4 {
   margin: 0 0 8px;
-  font-size: 14px;
+  font-size: 14.5px;
+  font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   color: var(--color-text);
 }
-.import-format-box p { margin: 0 0 8px; font-size: 13px; color: var(--color-text-muted); }
+.import-format-box p { margin: 0 0 10px; font-size: 13px; color: var(--color-text-muted); }
 .import-format-scroll {
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  padding: 8px 10px;
+  background: #FFFFFF;
+  border: none;
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
 }
 .import-format-scroll code {
   display: block;
@@ -39,21 +41,22 @@
   min-width: 100%;
   white-space: pre;
   font-size: 12.5px;
-  color: var(--color-primary);
+  color: var(--color-primary-dark);
+  font-weight: 600;
 }
 .import-format-list {
-  margin: 10px 0 0;
-  padding-left: 18px;
-  font-size: 12.5px;
+  margin: 12px 0 0;
+  padding-left: 20px;
+  font-size: 13px;
   color: var(--color-text-muted);
   line-height: 1.7;
 }
-.import-format-example { margin-top: 10px; font-size: 12.5px; }
-.import-format-example summary { cursor: pointer; color: var(--color-primary); font-weight: 600; }
+.import-format-example { margin-top: 12px; font-size: 13px; }
+.import-format-example summary { cursor: pointer; color: var(--color-primary-dark); font-weight: 600; }
 .import-format-example .import-format-scroll { margin-top: 8px; }
 .import-format-example code { color: var(--color-text-muted); }
 
-/* ---------- Dropzone / halaman: jangan pernah melebihi viewport ---------- */
+/* ---------- Dropzone ---------- */
 .import-page,
 .card-body,
 .import-preview-section,
@@ -64,22 +67,28 @@
 }
 
 .import-dropzone {
-  border: 2px dashed var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 32px 20px;
+  background: rgba(241, 245, 249, 0.6);
+  border: none;
+  border-radius: var(--radius-xl);
+  padding: 38px 24px;
   text-align: center;
   cursor: pointer;
-  transition: border-color 0.15s;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   color: var(--color-text-muted);
+  box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.03);
 }
-.import-dropzone:hover { border-color: var(--color-primary); }
-.import-dropzone i { font-size: 32px; color: var(--color-primary); margin-bottom: 8px; display: block; }
-.import-dropzone-hint { font-size: 12.5px; margin-top: 4px; }
-.import-dropzone-filename { margin-top: 10px; font-weight: 600; color: var(--color-text); word-break: break-all; }
+.import-dropzone:hover {
+  background: var(--color-primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(56, 189, 248, 0.15);
+}
+.import-dropzone i { font-size: 38px; color: var(--color-primary-dark); margin-bottom: 10px; display: block; }
+.import-dropzone-hint { font-size: 13px; margin-top: 4px; }
+.import-dropzone-filename { margin-top: 12px; font-weight: 700; color: var(--color-text); word-break: break-all; }
 
-.import-preview-note { font-size: 12.5px; color: var(--color-text-muted); margin: 0 0 12px; }
+.import-preview-note { font-size: 13px; color: var(--color-text-muted); margin: 0 0 14px; }
 
-/* ---------- Tabel preview: HALAMAN tidak boleh melebar, tabel yang di-scroll ---------- */
+/* ---------- Tabel Preview ---------- */
 .import-preview-wrap {
   width: 100%;
   max-width: 100%;
@@ -87,23 +96,43 @@
   overflow-x: auto;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border: none;
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-lg);
   max-height: 420px;
+  background: #FFFFFF;
 }
 #import-preview-table {
   width: 100%;
-  min-width: 820px; /* hanya berlaku di dalam wrapper yang bisa di-scroll */
-  border-collapse: collapse;
+  min-width: 820px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13.5px;
+}
+#import-preview-table th {
+  padding: 12px 16px;
+  background: rgba(248, 250, 252, 0.8);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  border: none;
+}
+#import-preview-table td {
+  padding: 12px 16px;
+  border: none;
+}
+#import-preview-table tbody tr:hover {
+  background: rgba(241, 245, 249, 0.6);
 }
 
-.import-image-status { font-size: 12.5px; white-space: nowrap; }
+.import-image-status { font-size: 12.5px; white-space: nowrap; font-weight: 600; }
 .import-image-status.none { color: var(--color-text-muted); }
 .import-image-status.ok { color: var(--color-success); }
 .import-image-status.warn { color: var(--color-warning); }
 
-.import-actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
-.import-actions .btn { flex: 1; min-width: 140px; min-height: 44px; }
+.import-actions { margin-top: 18px; display: flex; gap: 12px; flex-wrap: wrap; }
+.import-actions .btn { flex: 1; min-width: 140px; min-height: 46px; }
 @media (max-width: 600px) {
   .import-actions { flex-direction: column; width: 100%; }
   .import-actions .btn { width: 100%; min-width: 0; }
@@ -112,22 +141,23 @@
 .import-result-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
+  gap: 16px;
 }
 @media (max-width: 560px) {
   .import-result-grid { grid-template-columns: 1fr; }
 }
 .import-result-chip {
-  border-radius: var(--radius-md);
-  padding: 16px;
+  border-radius: var(--radius-lg);
+  padding: 20px;
   text-align: center;
-  border: 1px solid var(--color-border);
+  border: none;
+  box-shadow: var(--shadow-sm);
 }
 .import-result-chip.success { background: var(--color-success-light); }
 .import-result-chip.warning { background: var(--color-warning-light); }
 .import-result-chip.danger { background: var(--color-danger-light); }
-.import-result-value { font-size: 26px; font-weight: 800; }
+.import-result-value { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
 .import-result-chip.success .import-result-value { color: var(--color-success); }
 .import-result-chip.warning .import-result-value { color: var(--color-warning); }
 .import-result-chip.danger .import-result-value { color: var(--color-danger); }
-.import-result-label { font-size: 12.5px; color: var(--color-text-muted); margin-top: 4px; }
+.import-result-label { font-size: 13px; color: var(--color-text-muted); margin-top: 4px; font-weight: 500; }

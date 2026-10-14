@@ -1,34 +1,35 @@
 /* ==========================================================================
    INVENZA — Import Data Page Logic
-   Flow: pilih file -> parse -> preview -> validasi -> konfirmasi -> insert.
-
-   KEAMANAN (lihat PRD #10): kolom "user_id" pada file yang diupload TIDAK
-   PERNAH dibaca/dipercaya. Pemilik data SELALU diambil dari
-   getCurrentUserId() (Supabase Auth session yang sedang login), sehingga
-   import tidak bisa dipakai untuk memasukkan data ke akun orang lain.
+   Flow: Select file -> Parse -> Preview -> Validate -> Confirm -> Insert.
+   Security: Always binds rows to getCurrentUserId() (authenticated session).
    ========================================================================== */
 
 let importParsedRows = [];
 
 const IMPORT_FIELD_ALIASES = {
-  code: ["code", "kode", "kode barang", "kode_barang"],
-  name: ["name", "nama", "nama barang", "nama_barang"],
-  category: ["category", "kategori"],
-  price: ["price", "harga"],
-  stock: ["stock", "stok"],
-  unit: ["unit", "satuan"],
-  supplier: ["supplier"],
-  publisher: ["publisher", "publisher game", "publisher_game"],
-  kondisi: ["condition", "kondisi", "kondisi barang", "kondisi_barang"],
-  lokasi: ["location", "lokasi", "lokasi barang", "lokasi_barang"],
-  catatan: ["notes", "catatan"],
-  image_url: ["image_url", "gambar_url", "gambar", "gambar url", "image", "image url", "photo", "foto"],
+  code: ["code", "item code", "item_code", "sku", "kode", "kode barang", "kode_barang"],
+  name: ["name", "product name", "product_name", "item", "product", "nama", "nama barang", "nama_barang"],
+  category: ["category", "kategori", "type"],
+  price: ["price", "unit price", "unit_price", "cost", "harga"],
+  stock: ["stock", "quantity", "qty", "stok"],
+  unit: ["unit", "satuan", "uom"],
+  supplier: ["supplier", "vendor", "distributor"],
+  publisher: ["publisher", "brand", "manufacturer", "publisher game", "publisher_game", "game publisher"],
+  kondisi: ["condition", "kondisi", "kondisi barang", "status", "kondisi_barang"],
+  lokasi: ["location", "storage location", "lokasi", "lokasi barang", "warehouse", "lokasi_barang"],
+  catatan: ["notes", "remarks", "description", "catatan"],
+  image_url: ["image_url", "image", "image url", "photo", "gambar", "gambar_url", "gambar url"],
 };
-const IMPORT_KONDISI_VALUES = ["Bagus", "Rusak Ringan", "Rusak"];
 
-// Validasi URL gambar bersifat LUNAK (lihat PRD): URL kosong = tidak apa-apa
-// (image_url null), URL tidak valid = tetap boleh diimport (bukan error),
-// hanya ditandai warning di preview supaya pengguna tahu.
+function normalizeConditionValue(val) {
+  if (!val) return "Bagus";
+  const s = val.toString().trim().toLowerCase();
+  if (["bagus", "new", "brand new", "excellent", "good"].includes(s)) return "Bagus";
+  if (["rusak ringan", "fair", "minor defect", "used"].includes(s)) return "Rusak Ringan";
+  if (["rusak", "damaged", "broken", "faulty"].includes(s)) return "Rusak";
+  return "Bagus";
+}
+
 function isLikelyValidImageUrl(value) {
   if (!value) return false;
   try {
@@ -52,23 +53,30 @@ function bindImportEvents() {
   const confirmBtn = document.getElementById("import-confirm-btn");
   const cancelBtn = document.getElementById("import-cancel-btn");
 
+  if (!dropWrap || !fileInput) return;
+
   dropWrap.addEventListener("click", () => fileInput.click());
   fileInput.addEventListener("change", () => {
     const file = fileInput.files[0];
     if (file) handleFileSelected(file);
   });
 
-  confirmBtn.addEventListener("click", runImport);
-  cancelBtn.addEventListener("click", resetImportUI);
+  if (confirmBtn) confirmBtn.addEventListener("click", runImport);
+  if (cancelBtn) cancelBtn.addEventListener("click", resetImportUI);
 }
 
 function resetImportUI() {
   importParsedRows = [];
-  document.getElementById("import-file-input").value = "";
-  document.getElementById("import-filename").textContent = "";
-  document.getElementById("import-error-box").textContent = "";
-  document.getElementById("import-preview-section").classList.add("hidden");
-  document.getElementById("import-result-section").classList.add("hidden");
+  const fileInput = document.getElementById("import-file-input");
+  if (fileInput) fileInput.value = "";
+  const filename = document.getElementById("import-filename");
+  if (filename) filename.textContent = "";
+  const errorBox = document.getElementById("import-error-box");
+  if (errorBox) errorBox.textContent = "";
+  const prevSec = document.getElementById("import-preview-section");
+  if (prevSec) prevSec.classList.add("hidden");
+  const resSec = document.getElementById("import-result-section");
+  if (resSec) resSec.classList.add("hidden");
 }
 
 /* ---------------------------------------------------------------------- */
@@ -76,9 +84,12 @@ function resetImportUI() {
 /* ---------------------------------------------------------------------- */
 
 async function handleFileSelected(file) {
-  document.getElementById("import-error-box").textContent = "";
-  document.getElementById("import-result-section").classList.add("hidden");
-  document.getElementById("import-filename").textContent = file.name;
+  const errorBox = document.getElementById("import-error-box");
+  if (errorBox) errorBox.textContent = "";
+  const resSec = document.getElementById("import-result-section");
+  if (resSec) resSec.classList.add("hidden");
+  const nameEl = document.getElementById("import-filename");
+  if (nameEl) nameEl.textContent = file.name;
 
   const ext = (file.name.split(".").pop() || "").toLowerCase();
 
@@ -89,12 +100,12 @@ async function handleFileSelected(file) {
     } else if (["csv", "xlsx", "xls"].includes(ext)) {
       rawRows = await parseSheetFile(file);
     } else {
-      showImportError("Format file tidak didukung. Gunakan .xlsx, .xls, .csv, atau .json.");
+      showImportError("Unsupported file format. Please upload .xlsx, .xls, .csv, or .json.");
       return;
     }
 
     if (!rawRows.length) {
-      showImportError("File tidak berisi data yang bisa dibaca.");
+      showImportError("File contains no readable data rows.");
       return;
     }
 
@@ -102,13 +113,15 @@ async function handleFileSelected(file) {
     renderImportPreview(importParsedRows);
   } catch (err) {
     console.error(err);
-    showImportError("Gagal membaca file: " + translateError(err));
+    showImportError("Failed to parse file: " + translateError(err));
   }
 }
 
 function showImportError(message) {
-  document.getElementById("import-error-box").textContent = message;
-  document.getElementById("import-preview-section").classList.add("hidden");
+  const errorBox = document.getElementById("import-error-box");
+  if (errorBox) errorBox.textContent = message;
+  const prevSec = document.getElementById("import-preview-section");
+  if (prevSec) prevSec.classList.add("hidden");
 }
 
 function parseJsonFile(file) {
@@ -122,15 +135,15 @@ function parseJsonFile(file) {
         else if (data && Array.isArray(data.products)) arr = data.products;
         else if (data && data.data && Array.isArray(data.data)) arr = data.data;
         if (!arr) {
-          reject(new Error("Format JSON harus berupa array data barang."));
+          reject(new Error("JSON data must contain an array of product objects."));
           return;
         }
         resolve(arr);
       } catch (e) {
-        reject(new Error("File JSON tidak valid."));
+        reject(new Error("Invalid JSON file formatting."));
       }
     };
-    reader.onerror = () => reject(new Error("Gagal membaca file JSON."));
+    reader.onerror = () => reject(new Error("Failed to read JSON file."));
     reader.readAsText(file);
   });
 }
@@ -138,7 +151,7 @@ function parseJsonFile(file) {
 function parseSheetFile(file) {
   return new Promise((resolve, reject) => {
     if (typeof XLSX === "undefined") {
-      reject(new Error("Pustaka pembaca file belum termuat. Periksa koneksi internet Anda."));
+      reject(new Error("Spreadsheet parser library is not loaded. Please check your network connection."));
       return;
     }
     const reader = new FileReader();
@@ -149,10 +162,10 @@ function parseSheetFile(file) {
         const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
         resolve(rows);
       } catch (e) {
-        reject(new Error("Gagal membaca isi file."));
+        reject(new Error("Failed to read spreadsheet contents."));
       }
     };
-    reader.onerror = () => reject(new Error("Gagal membaca file."));
+    reader.onerror = () => reject(new Error("Failed to read file."));
     reader.readAsArrayBuffer(file);
   });
 }
@@ -184,11 +197,8 @@ function normalizeImportRows(rawRows) {
     const price = priceRaw === "" ? 0 : Number(priceRaw);
     const stock = stockRaw === "" ? 0 : Number(stockRaw);
 
-    let kondisi = get("kondisi");
-    if (!IMPORT_KONDISI_VALUES.includes(kondisi)) kondisi = "Bagus";
+    const kondisi = normalizeConditionValue(get("kondisi"));
 
-    // Gambar: OPSIONAL. Kosong -> tidak apa-apa. Tidak valid -> tetap boleh
-    // diimport (tidak menggagalkan proses), hanya ditandai warning di preview.
     const gambarRaw = get("image_url");
     let imageUrl = null;
     let imageWarning = false;
@@ -201,19 +211,19 @@ function normalizeImportRows(rawRows) {
     }
 
     const errors = [];
-    if (!name) errors.push("Nama kosong");
-    if (!category) errors.push("Kategori kosong");
-    if (isNaN(price) || price < 0) errors.push("Harga tidak valid");
-    if (isNaN(stock) || stock < 0) errors.push("Stok tidak valid");
+    if (!name) errors.push("Missing name");
+    if (!category) errors.push("Missing category");
+    if (isNaN(price) || price < 0) errors.push("Invalid price");
+    if (isNaN(stock) || stock < 0) errors.push("Invalid stock");
 
     return {
       _row: idx + 1,
-      code: get("code"), // boleh kosong -> auto-generate saat import
+      code: get("code"),
       name,
       category,
       price: isNaN(price) ? 0 : price,
       stock: isNaN(stock) ? 0 : stock,
-      unit: get("unit") || "Unit",
+      unit: get("unit") || "Pcs",
       supplier: get("supplier") || "-",
       publisher: get("publisher") || null,
       kondisi,
@@ -231,6 +241,8 @@ function renderImportPreview(rows) {
   const body = document.getElementById("import-preview-body");
   const countEl = document.getElementById("import-preview-count");
 
+  if (!section || !body || !countEl) return;
+
   countEl.textContent = rows.length;
 
   const MAX_PREVIEW_ROWS = 200;
@@ -240,19 +252,19 @@ function renderImportPreview(rows) {
     .map((r) => {
       const statusBadge = r._errors.length
         ? `<span class="badge badge-danger" title="${escapeHtml(r._errors.join(", "))}">Error</span>`
-        : `<span class="badge badge-success">Siap</span>`;
+        : `<span class="badge badge-success">Ready</span>`;
       let gambarCell = '<span class="import-image-status none">-</span>';
       if (r._imageWarning) {
-        gambarCell = '<span class="import-image-status warn" title="URL gambar tidak valid, barang tetap diimport tanpa gambar">⚠ URL tidak valid</span>';
+        gambarCell = '<span class="import-image-status warn" title="Invalid image URL. Item will be imported without an image.">⚠ Invalid</span>';
       } else if (r.image_url) {
-        gambarCell = '<span class="import-image-status ok" title="' + escapeHtml(r.image_url) + '">🖼 Ada gambar</span>';
+        gambarCell = '<span class="import-image-status ok" title="' + escapeHtml(r.image_url) + '">🖼 Attached</span>';
       }
       return `
       <tr>
         <td>${r._row}</td>
-        <td>${escapeHtml(r.code || "(otomatis)")}</td>
-        <td>${escapeHtml(r.name)}</td>
-        <td>${escapeHtml(r.category)}</td>
+        <td><code>${escapeHtml(r.code || "(auto)")}</code></td>
+        <td style="font-weight:600;">${escapeHtml(r.name)}</td>
+        <td><span class="badge" style="background:rgba(224,242,254,0.7);color:#0284c7;">${escapeHtml(r.category)}</span></td>
         <td>${formatRupiah(r.price)}</td>
         <td>${r.stock}</td>
         <td>${escapeHtml(r.kondisi)}</td>
@@ -263,13 +275,14 @@ function renderImportPreview(rows) {
     .join("");
 
   if (rows.length > MAX_PREVIEW_ROWS) {
-    body.innerHTML += `<tr><td colspan="9" style="text-align:center;color:var(--color-text-muted);padding:10px;">... dan ${
+    body.innerHTML += `<tr><td colspan="9" style="text-align:center;color:var(--color-text-muted);padding:12px;">... and ${
       rows.length - MAX_PREVIEW_ROWS
-    } baris lainnya</td></tr>`;
+    } additional rows</td></tr>`;
   }
 
   section.classList.remove("hidden");
-  document.getElementById("import-result-section").classList.add("hidden");
+  const resSec = document.getElementById("import-result-section");
+  if (resSec) resSec.classList.add("hidden");
 }
 
 /* ---------------------------------------------------------------------- */
@@ -280,11 +293,9 @@ async function runImport() {
   if (!importParsedRows.length) return;
 
   const confirmBtn = document.getElementById("import-confirm-btn");
-  setButtonLoading(confirmBtn, true, "Mengimpor...");
+  setButtonLoading(confirmBtn, true, "Importing...");
 
   try {
-    // user_id SELALU dari sesi Supabase Auth yang sedang login — TIDAK
-    // PERNAH dari kolom "user_id" pada file yang diimport.
     const userId = await getCurrentUserId();
     if (!userId) return;
 
@@ -344,7 +355,7 @@ async function runImport() {
     }
 
     showImportResult(success, skipped, failed);
-    showToast(`Import selesai — ${success} berhasil, ${skipped} dilewati, ${failed} error.`, success > 0 ? "success" : "error");
+    showToast(`Import complete — ${success} imported, ${skipped} skipped, ${failed} failed.`, success > 0 ? "success" : "error");
   } catch (err) {
     console.error(err);
     showToast(translateError(err), "error");
@@ -354,9 +365,15 @@ async function runImport() {
 }
 
 function showImportResult(success, skipped, failed) {
-  document.getElementById("result-success").textContent = success;
-  document.getElementById("result-skipped").textContent = skipped;
-  document.getElementById("result-failed").textContent = failed;
-  document.getElementById("import-preview-section").classList.add("hidden");
-  document.getElementById("import-result-section").classList.remove("hidden");
+  const sEl = document.getElementById("result-success");
+  if (sEl) sEl.textContent = success;
+  const skEl = document.getElementById("result-skipped");
+  if (skEl) skEl.textContent = skipped;
+  const fEl = document.getElementById("result-failed");
+  if (fEl) fEl.textContent = failed;
+
+  const prevSec = document.getElementById("import-preview-section");
+  if (prevSec) prevSec.classList.add("hidden");
+  const resSec = document.getElementById("import-result-section");
+  if (resSec) resSec.classList.remove("hidden");
 }
