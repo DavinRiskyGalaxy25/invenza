@@ -725,3 +725,16 @@ a.topbar-user:hover { background: #FFFFFF; box-shadow: var(--shadow-md); transfo
   line-height: 1.6;
 }
 .app-footer strong { color: var(--color-text); }
+
+/* ---------- Hide Netlify Drawer / Feedback Badge ---------- */
+#netlify-drawer,
+iframe#netlify-drawer-iframe,
+[data-netlify-drawer],
+.netlify-badge,
+netlify-drawer {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
