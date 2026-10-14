@@ -6,7 +6,7 @@
    di sini karena bersifat dinamis/real-time.
    ========================================================================== */
 
-const CACHE_NAME = "invenza-cache-v20";
+const CACHE_NAME = "invenza-cache-v21";
 
 const APP_SHELL = [
   "./",

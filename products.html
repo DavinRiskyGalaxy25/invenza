@@ -12,8 +12,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Invenza">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="css/style.css?v=20">
-  <link rel="stylesheet" href="css/products.css?v=20">
+  <link rel="stylesheet" href="css/style.css?v=21">
+  <link rel="stylesheet" href="css/products.css?v=21">
 </head>
 <body>
 
@@ -140,16 +140,92 @@
                     <th style="text-align:right;">Actions</th>
                   </tr>
                 </thead>
-                <tbody id="products-table-body"></tbody>
+                <tbody id="products-table-body">
+                  <tr>
+                    <td><span class="skeleton skeleton-thumb"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:65px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:150px;"></span></td>
+                    <td><span class="skeleton skeleton-pill" style="width:75px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:85px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:55px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:40px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:95px;"></span></td>
+                    <td style="text-align:right;"><span class="skeleton skeleton-text" style="width:50px;"></span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="skeleton skeleton-thumb"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:70px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:130px;"></span></td>
+                    <td><span class="skeleton skeleton-pill" style="width:80px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:90px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:60px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:35px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:110px;"></span></td>
+                    <td style="text-align:right;"><span class="skeleton skeleton-text" style="width:50px;"></span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="skeleton skeleton-thumb"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:60px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:165px;"></span></td>
+                    <td><span class="skeleton skeleton-pill" style="width:70px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:80px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:50px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:40px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:85px;"></span></td>
+                    <td style="text-align:right;"><span class="skeleton skeleton-text" style="width:50px;"></span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="skeleton skeleton-thumb"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:65px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:140px;"></span></td>
+                    <td><span class="skeleton skeleton-pill" style="width:85px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:95px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:65px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:35px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:105px;"></span></td>
+                    <td style="text-align:right;"><span class="skeleton skeleton-text" style="width:50px;"></span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="skeleton skeleton-thumb"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:55px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:125px;"></span></td>
+                    <td><span class="skeleton skeleton-pill" style="width:75px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:75px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:45px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:40px;"></span></td>
+                    <td><span class="skeleton skeleton-text" style="width:90px;"></span></td>
+                    <td style="text-align:right;"><span class="skeleton skeleton-text" style="width:50px;"></span></td>
+                  </tr>
+                </tbody>
               </table>
-              <div id="products-loading" style="text-align:center;padding:36px;color:var(--color-text-muted);">
-                <div class="spinner spinner-dark" style="margin:0 auto 12px;"></div>
-                Loading inventory catalog...
-              </div>
+              <div id="products-loading" class="hidden"></div>
             </div>
 
             <!-- Mobile cards -->
-            <div class="products-cards" id="products-cards"></div>
+            <div class="products-cards" id="products-cards">
+              <div class="product-card" style="pointer-events:none;">
+                <span class="skeleton" style="width:60px;height:60px;border-radius:var(--radius-md);flex-shrink:0;"></span>
+                <div class="product-card-body" style="width:100%;">
+                  <span class="skeleton skeleton-title" style="width:70%;height:16px;margin-bottom:8px;"></span>
+                  <span class="skeleton skeleton-text" style="width:45%;height:12px;margin-bottom:12px;"></span>
+                  <div class="product-card-meta">
+                    <span class="skeleton skeleton-text" style="width:85px;height:16px;"></span>
+                    <span class="skeleton skeleton-text" style="width:55px;height:14px;"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="product-card" style="pointer-events:none;">
+                <span class="skeleton" style="width:60px;height:60px;border-radius:var(--radius-md);flex-shrink:0;"></span>
+                <div class="product-card-body" style="width:100%;">
+                  <span class="skeleton skeleton-title" style="width:80%;height:16px;margin-bottom:8px;"></span>
+                  <span class="skeleton skeleton-text" style="width:50%;height:12px;margin-bottom:12px;"></span>
+                  <div class="product-card-meta">
+                    <span class="skeleton skeleton-text" style="width:75px;height:16px;"></span>
+                    <span class="skeleton skeleton-text" style="width:60px;height:14px;"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <div id="products-empty" class="empty-state hidden">
               <div class="empty-icon"><i class="bi bi-inbox"></i></div>
@@ -324,7 +400,7 @@
   <script src="js/utils.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/pwa.js"></script>
-  <script src="js/products.js?v=20"></script>
+  <script src="js/products.js?v=21"></script>
   <script>
     // If redirected from product detail with ?edit=ID, auto-open edit modal
     document.addEventListener("DOMContentLoaded", () => {

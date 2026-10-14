@@ -13,18 +13,17 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Invenza">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/style.css?v=21">
+  <link rel="stylesheet" href="css/auth.css?v=21">
 </head>
 <body>
 
-  <!-- ============ SPLASH SCREEN ============ -->
+  <!-- ============ SPLASH SCREEN (Centered Logo with Shimmer Animation) ============ -->
   <div id="splash-screen">
-    <img src="assets/icons/icon-192.png" alt="Invenza Logo" class="splash-logo">
-    <div class="splash-name">Invenza</div>
-    <div class="splash-tagline">NexByte Game Store — Inventory System</div>
-    <div class="splash-loader"></div>
-    <div class="splash-dev">Designed &amp; Engineered by Nexora</div>
+    <div class="splash-logo-container">
+      <img src="assets/icons/icon-192.png" alt="Invenza Logo" class="splash-logo-img">
+      <div class="splash-shimmer-sweep"></div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>

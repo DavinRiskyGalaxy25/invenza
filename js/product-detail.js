@@ -24,11 +24,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function loadProductDetail(id) {
-  const loadingEl = document.getElementById("detail-loading");
+  const skeletonEl = document.getElementById("detail-skeleton");
   const contentEl = document.getElementById("detail-content");
   const notFoundEl = document.getElementById("detail-not-found");
 
-  if (loadingEl) loadingEl.classList.remove("hidden");
+  if (skeletonEl) skeletonEl.classList.remove("hidden");
   if (contentEl) contentEl.classList.add("hidden");
   if (notFoundEl) notFoundEl.classList.add("hidden");
 
@@ -50,21 +50,22 @@ async function loadProductDetail(id) {
 
     currentProduct = data;
     renderDetail(data);
+    if (skeletonEl) skeletonEl.classList.add("hidden");
     if (contentEl) contentEl.classList.remove("hidden");
   } catch (err) {
     console.error(err);
     showToast(translateError(err), "error");
     showNotFound();
   } finally {
-    if (loadingEl) loadingEl.classList.add("hidden");
+    if (skeletonEl) skeletonEl.classList.add("hidden");
   }
 }
 
 function showNotFound() {
-  const loadingEl = document.getElementById("detail-loading");
+  const skeletonEl = document.getElementById("detail-skeleton");
   const contentEl = document.getElementById("detail-content");
   const notFoundEl = document.getElementById("detail-not-found");
-  if (loadingEl) loadingEl.classList.add("hidden");
+  if (skeletonEl) skeletonEl.classList.add("hidden");
   if (contentEl) contentEl.classList.add("hidden");
   if (notFoundEl) notFoundEl.classList.remove("hidden");
 }

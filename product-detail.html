@@ -12,8 +12,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Invenza">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="css/style.css?v=20">
-  <link rel="stylesheet" href="css/products.css?v=20">
+  <link rel="stylesheet" href="css/style.css?v=21">
+  <link rel="stylesheet" href="css/products.css?v=21">
 </head>
 <body>
 
@@ -89,9 +89,36 @@
           <i class="bi bi-arrow-left"></i> Back to Inventory
         </a>
 
-        <div id="detail-loading" style="text-align:center;padding:60px;color:var(--color-text-muted);">
-          <div class="spinner spinner-dark" style="margin:0 auto 12px;"></div>
-          Loading product details...
+        <!-- Skeleton Loading Placeholder -->
+        <div id="detail-skeleton" class="card">
+          <div class="card-body">
+            <div class="detail-grid">
+              <span class="skeleton" style="width:100%;aspect-ratio:1/1;border-radius:var(--radius-xl);"></span>
+              <div>
+                <span class="skeleton skeleton-pill" style="width:80px;height:22px;margin-bottom:12px;display:block;"></span>
+                <span class="skeleton skeleton-title" style="width:65%;height:28px;margin-bottom:8px;"></span>
+                <span class="skeleton skeleton-text" style="width:35%;height:14px;margin-bottom:24px;display:block;"></span>
+                <div class="detail-info-grid">
+                  <div class="detail-info-item">
+                    <span class="skeleton skeleton-text" style="width:50px;height:11px;margin-bottom:4px;display:block;"></span>
+                    <span class="skeleton skeleton-text" style="width:90px;height:18px;display:block;"></span>
+                  </div>
+                  <div class="detail-info-item">
+                    <span class="skeleton skeleton-text" style="width:60px;height:11px;margin-bottom:4px;display:block;"></span>
+                    <span class="skeleton skeleton-text" style="width:100px;height:18px;display:block;"></span>
+                  </div>
+                  <div class="detail-info-item">
+                    <span class="skeleton skeleton-text" style="width:65px;height:11px;margin-bottom:4px;display:block;"></span>
+                    <span class="skeleton skeleton-text" style="width:75px;height:18px;display:block;"></span>
+                  </div>
+                  <div class="detail-info-item">
+                    <span class="skeleton skeleton-text" style="width:50px;height:11px;margin-bottom:4px;display:block;"></span>
+                    <span class="skeleton skeleton-text" style="width:110px;height:18px;display:block;"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div id="detail-not-found" class="card hidden">
@@ -176,6 +203,6 @@
   <script src="js/utils.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/pwa.js"></script>
-  <script src="js/product-detail.js?v=20"></script>
+  <script src="js/product-detail.js?v=21"></script>
 </body>
 </html>
