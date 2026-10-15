@@ -117,6 +117,45 @@
   animation: spin-once 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* ---------- Quick Actions Bar (Icon-Only Buttons) ---------- */
+.quick-actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+.quick-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--glass-bg-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  box-shadow: var(--shadow-md), var(--glass-specular);
+  color: var(--color-text);
+  font-size: 20px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+}
+.quick-action-btn:hover {
+  transform: translateY(-4px) scale(1.08);
+  box-shadow: var(--shadow-lg);
+  background: rgba(226, 232, 240, 0.9);
+  color: var(--color-primary-dark);
+}
+.quick-action-btn:active {
+  transform: translateY(-1px) scale(1.02);
+}
+@media (max-width: 540px) {
+  .quick-actions-bar { gap: 12px; }
+  .quick-action-btn { width: 46px; height: 46px; font-size: 18px; }
+}
+
 /* ---------- Stats Grid (Inspired by Purple Dashboard 3D Glass Arc Cards) ---------- */
 .stats-grid {
   display: grid;
