@@ -101,59 +101,57 @@
   opacity: 0;
   transform: translateY(4px);
 }
-.welcome-banner-actions { position: relative; z-index: 1; display: flex; gap: 10px; flex-wrap: wrap; }
-.welcome-banner-actions .btn {
+.welcome-banner-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.welcome-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.92);
   color: var(--color-primary-dark);
-  font-weight: 700;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  font-size: 19px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
 }
-.welcome-banner-actions .btn:hover { background: #FFFFFF; transform: translateY(-1.5px); }
+.welcome-action-btn:hover {
+  background: #FFFFFF;
+  color: var(--color-primary-deep);
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+}
+.welcome-action-btn:active {
+  transform: translateY(-1px) scale(0.98);
+}
+@media (max-width: 540px) {
+  .welcome-banner-actions {
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .welcome-action-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 17px;
+  }
+}
 @keyframes spin-once {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 .spin-once {
   animation: spin-once 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* ---------- Quick Actions Bar (Icon-Only Buttons) ---------- */
-.quick-actions-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 26px;
-}
-.quick-action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: var(--glass-bg-card);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: var(--glass-border);
-  box-shadow: var(--shadow-md), var(--glass-specular);
-  color: var(--color-text);
-  font-size: 20px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  text-decoration: none;
-}
-.quick-action-btn:hover {
-  transform: translateY(-4px) scale(1.08);
-  box-shadow: var(--shadow-lg);
-  background: rgba(226, 232, 240, 0.9);
-  color: var(--color-primary-dark);
-}
-.quick-action-btn:active {
-  transform: translateY(-1px) scale(1.02);
-}
-@media (max-width: 540px) {
-  .quick-actions-bar { gap: 12px; }
-  .quick-action-btn { width: 46px; height: 46px; font-size: 18px; }
 }
 
 /* ---------- Stats Grid (Inspired by Purple Dashboard 3D Glass Arc Cards) ---------- */
